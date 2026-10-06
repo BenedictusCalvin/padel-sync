@@ -966,15 +966,15 @@ export function App() {
   // Check authorization for Private tournament
   if (isPrivateTournament && !isAuthorizedForPrivate) {
     return (
-      <div className="min-h-screen bg-[#080c14] text-slate-100 flex flex-col font-sans pb-12">
-        <header className="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40">
+      <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans pb-12">
+        <header className="border-b border-slate-200/80 bg-white/80 backdrop-blur-md sticky top-0 z-40 shadow-xs">
           <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
             <button
               type="button"
               onClick={handleBackToHub}
-              className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+              className="px-3.5 py-1.5 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
             >
-              <ArrowLeft className="w-4 h-4 text-emerald-400" />
+              <ArrowLeft className="w-4 h-4 text-emerald-600" />
               <span>{t.backToHub}</span>
             </button>
             <div className="flex items-center gap-2">
@@ -984,19 +984,19 @@ export function App() {
         </header>
 
         <main className="flex-1 flex items-center justify-center p-4">
-          <div className="glass-panel p-8 sm:p-10 rounded-3xl border border-amber-500/30 max-w-md w-full text-center space-y-6 shadow-2xl relative overflow-hidden animate-fadeIn">
-            <div className="w-20 h-20 rounded-3xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto shadow-lg shadow-amber-500/10">
+          <div className="bg-white p-8 sm:p-10 rounded-3xl border border-amber-200 max-w-md w-full text-center space-y-6 shadow-sm relative overflow-hidden animate-fadeIn">
+            <div className="w-20 h-20 rounded-3xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto shadow-2xs">
               <Lock className="w-10 h-10 stroke-[2]" />
             </div>
 
             <div className="space-y-2">
-              <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 uppercase tracking-wider inline-block">
+              <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 uppercase tracking-wider inline-block">
                 {t.visibilityPrivate}
               </span>
-              <h2 className="text-2xl font-black text-white tracking-tight pt-2">
+              <h2 className="text-2xl font-bold text-slate-900 tracking-tight pt-2">
                 {t.privateRestrictedTitle}
               </h2>
-              <p className="text-slate-400 text-xs leading-relaxed">
+              <p className="text-slate-500 text-xs leading-relaxed">
                 {t.privateRestrictedDesc}
               </p>
             </div>
@@ -1005,7 +1005,7 @@ export function App() {
               <button
                 type="button"
                 onClick={() => setInviteModalTourneyId(activeRecord.id)}
-                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-1.5"
+                className="flex-1 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 <span>{t.requestToJoin}</span>
@@ -1015,7 +1015,7 @@ export function App() {
                 <button
                   type="button"
                   onClick={() => setShowAuthModal(true)}
-                  className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 transition-all"
+                  className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs rounded-xl border border-slate-200 transition-all shadow-xs cursor-pointer"
                 >
                   {t.signIn}
                 </button>
@@ -1023,7 +1023,7 @@ export function App() {
               <button
                 type="button"
                 onClick={handleBackToHub}
-                className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white font-bold text-xs rounded-xl border border-slate-800 transition-all"
+                className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-all cursor-pointer"
               >
                 {t.backToHub}
               </button>
@@ -1066,39 +1066,39 @@ export function App() {
   const rounds = activeRecord.rounds;
 
   return (
-    <div className="min-h-screen bg-[#080c14] text-slate-100 flex flex-col font-sans pb-12 animate-fadeIn">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans pb-12 animate-fadeIn">
       {/* Spectator Live Score Alert Banner */}
       {isSpectatorMode && (
-        <div className="bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 text-white px-4 py-2 text-center text-xs font-black tracking-wide flex items-center justify-center gap-2 shadow-lg">
-          <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping" />
+        <div className="bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 text-white px-4 py-2 text-center text-xs font-bold tracking-wide flex items-center justify-center gap-2 shadow-sm">
+          <span className="w-2 h-2 rounded-full bg-white animate-ping" />
           <span>{t.spectatorModeTitle}</span>
           <span className="font-normal opacity-90 hidden sm:inline">• {t.spectatorModeDesc}</span>
         </div>
       )}
 
       {/* Top Global Navigation Bar */}
-      <header className="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40">
+      <header className="border-b border-slate-200/80 bg-white/80 backdrop-blur-md sticky top-0 z-40 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
           {/* Back to Tournament Hub Button */}
           <div className="flex items-center gap-3 shrink-0">
             <button
               type="button"
               onClick={handleBackToHub}
-              className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+              className="px-3.5 py-1.5 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
               title={t.backToTournaments}
             >
-              <ArrowLeft className="w-4 h-4 text-emerald-400" />
-              <span className="hidden sm:inline">{t.backToTournaments}</span>
+              <ArrowLeft className="w-4 h-4 text-emerald-600" />
+              <span>{t.backToTournaments}</span>
             </button>
 
-            <div className="h-5 w-px bg-slate-800 hidden sm:block" />
+            <div className="h-5 w-px bg-slate-200 hidden sm:block" />
 
             {/* Tournament Title & Subtitle */}
             <div className="min-w-0 max-w-[180px] sm:max-w-xs md:max-w-sm">
-              <h1 className="font-black text-base text-white tracking-wide truncate leading-tight" title={config.name}>
+              <h1 className="font-bold text-base text-slate-900 tracking-tight truncate leading-tight" title={config.name}>
                 {config.name}
               </h1>
-              <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5 truncate">
+              <div className="text-[11px] text-slate-500 font-medium capitalize mt-0.5 truncate">
                 {config.format.replace(/_/g, ' ')} • {config.pairingMode === 'fixed_pair' ? (lang === 'id' ? 'Tim 2v2' : '2v2 Team') : (lang === 'id' ? 'Individu' : 'Individual')}
               </div>
             </div>
@@ -1108,26 +1108,26 @@ export function App() {
           <div className="relative group">
             {/* Hover Trigger Pill */}
             <div
-              className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-2 transition-all shadow-sm cursor-pointer select-none whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-all shadow-2xs cursor-pointer select-none whitespace-nowrap ${
                 isPrivateTournament
-                  ? 'bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/30 text-amber-300'
-                  : 'bg-emerald-500/10 hover:bg-emerald-500/20 border-emerald-500/30 text-emerald-300'
+                  ? 'bg-amber-50 hover:bg-amber-100/70 border-amber-200 text-amber-800'
+                  : 'bg-emerald-50 hover:bg-emerald-100/70 border-emerald-200 text-emerald-800'
               }`}
             >
               {isPrivateTournament ? (
                 <>
-                  <Lock className="w-3.5 h-3.5 text-amber-400" />
+                  <Lock className="w-3.5 h-3.5 text-amber-600" />
                   <span>{lang === 'id' ? 'Privat' : 'Private'}</span>
                 </>
               ) : (
                 <>
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <Globe className="w-3.5 h-3.5 text-emerald-400" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <Globe className="w-3.5 h-3.5 text-emerald-600" />
                   <span>{lang === 'id' ? 'Publik Live' : 'Public Live'}</span>
                 </>
               )}
-              <span className="text-slate-600 font-normal hidden sm:inline">•</span>
-              <span className="text-slate-300 font-semibold capitalize hidden sm:inline">
+              <span className="text-slate-400 font-normal hidden sm:inline">•</span>
+              <span className="text-slate-700 font-medium capitalize hidden sm:inline">
                 {config.format.replace(/_/g, ' ')}
               </span>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition-transform duration-200" />
@@ -1135,25 +1135,25 @@ export function App() {
 
             {/* Floating Popover on Hover (with invisible bridge to prevent closing on mouse move) */}
             <div className="absolute left-0 sm:left-1/2 sm:-translate-x-1/2 top-full pt-2 w-72 sm:w-80 opacity-0 translate-y-1 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50">
-              <div className="p-4 rounded-2xl bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 shadow-2xl space-y-3 relative overflow-hidden">
-                {/* Subtle Neon Glow Background */}
+              <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xl space-y-3 relative overflow-hidden text-slate-900">
+                {/* Subtle Glow Background */}
                 <div className={`absolute -right-10 -top-10 w-32 h-32 rounded-full blur-2xl pointer-events-none ${
                   isPrivateTournament ? 'bg-amber-500/10' : 'bg-emerald-500/10'
                 }`} />
 
                 {/* Popover Header: Status & Instant Switcher */}
-                <div className="pb-3 border-b border-slate-800 relative z-10 space-y-2.5">
+                <div className="pb-3 border-b border-slate-100 relative z-10 space-y-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold shrink-0 ${
-                      isPrivateTournament ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400'
+                      isPrivateTournament ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                     }`}>
                       {isPrivateTournament ? <Lock className="w-4 h-4" /> : <Globe className="w-4 h-4" />}
                     </div>
                     <div className="min-w-0">
-                      <div className="font-extrabold text-xs text-white flex items-center gap-1.5">
+                      <div className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
                         <span>{isPrivateTournament ? t.visibilityPrivate : t.visibilityPublic}</span>
                       </div>
-                      <div className="text-[10px] text-slate-400 mt-0.5 leading-snug">
+                      <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">
                         {isPrivateTournament
                           ? (lang === 'id' ? 'Khusus pemain terdaftar & pembuat' : 'Restricted to roster players & creator')
                           : (lang === 'id' ? 'Live score terbuka untuk penonton' : 'Real-time live scores open to all')}
@@ -1163,17 +1163,17 @@ export function App() {
 
                   {/* Instant Switcher (Public vs Private) */}
                   {!isSpectatorMode && (
-                    <div className="flex items-center gap-1 p-1 bg-slate-950/80 rounded-xl border border-slate-800 text-[11px]">
+                    <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl border border-slate-200 text-[11px]">
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleUpdateVisibility('public');
                         }}
-                        className={`flex-1 py-1.5 px-2 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all ${
+                        className={`flex-1 py-1.5 px-2 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                           !isPrivateTournament
-                            ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
-                            : 'text-slate-400 hover:text-white hover:bg-slate-900'
+                            ? 'bg-white text-emerald-700 shadow-2xs font-semibold'
+                            : 'text-slate-600 hover:text-slate-900'
                         }`}
                         title={lang === 'id' ? 'Ubah status menjadi Publik' : 'Change to Public'}
                       >
@@ -1186,10 +1186,10 @@ export function App() {
                           e.stopPropagation();
                           handleUpdateVisibility('private');
                         }}
-                        className={`flex-1 py-1.5 px-2 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all ${
+                        className={`flex-1 py-1.5 px-2 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                           isPrivateTournament
-                            ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                            : 'text-slate-400 hover:text-white hover:bg-slate-900'
+                            ? 'bg-white text-amber-700 shadow-2xs font-semibold'
+                            : 'text-slate-600 hover:text-slate-900'
                         }`}
                         title={lang === 'id' ? 'Ubah status menjadi Privat' : 'Change to Private'}
                       >
@@ -1207,34 +1207,34 @@ export function App() {
                   </div>
 
                   {/* Format */}
-                  <div className="flex items-center justify-between p-2 rounded-xl bg-slate-950/70 border border-slate-800 text-xs">
-                    <div className="flex items-center gap-2 text-slate-300">
-                      <Shuffle className="w-3.5 h-3.5 text-emerald-400" />
+                  <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-200/70 text-xs">
+                    <div className="flex items-center gap-2 text-slate-600">
+                      <Shuffle className="w-3.5 h-3.5 text-emerald-600" />
                       <span>{lang === 'id' ? 'Format Match' : 'Match Format'}</span>
                     </div>
-                    <span className="font-bold text-emerald-400 uppercase text-[11px] tracking-wide">
+                    <span className="font-bold text-slate-900 uppercase text-[11px] tracking-wide">
                       {config.format.replace(/_/g, ' ')}
                     </span>
                   </div>
 
                   {/* Mode Pasangan */}
-                  <div className="flex items-center justify-between p-2 rounded-xl bg-slate-950/70 border border-slate-800 text-xs">
-                    <div className="flex items-center gap-2 text-slate-300">
-                      <Users className="w-3.5 h-3.5 text-cyan-400" />
+                  <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-200/70 text-xs">
+                    <div className="flex items-center gap-2 text-slate-600">
+                      <Users className="w-3.5 h-3.5 text-sky-600" />
                       <span>{lang === 'id' ? 'Mode Pasangan' : 'Pairing Mode'}</span>
                     </div>
-                    <span className="font-bold text-cyan-300 text-[11px]">
+                    <span className="font-bold text-slate-900 text-[11px]">
                       {config.pairingMode === 'fixed_pair' ? t.fixedPairMode : t.individualMode}
                     </span>
                   </div>
 
                   {/* Sistem Skor */}
-                  <div className="flex items-center justify-between p-2 rounded-xl bg-slate-950/70 border border-slate-800 text-xs">
-                    <div className="flex items-center gap-2 text-slate-300">
-                      <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                  <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-200/70 text-xs">
+                    <div className="flex items-center gap-2 text-slate-600">
+                      <Trophy className="w-3.5 h-3.5 text-amber-600" />
                       <span>{lang === 'id' ? 'Sistem Skor' : 'Scoring System'}</span>
                     </div>
-                    <span className="font-bold text-amber-300 text-[11px] font-mono">
+                    <span className="font-bold text-slate-900 text-[11px] font-mono">
                       {config.scoringSystem === 'fixed_points'
                         ? `Fixed ${config.targetPoints} Pts`
                         : config.tennisGameMode === 'total_games'
@@ -1245,31 +1245,31 @@ export function App() {
 
                   {/* Punto de Oro */}
                   {config.goldenPoint && (
-                    <div className="flex items-center justify-between p-2 rounded-xl bg-yellow-950/20 border border-yellow-500/30 text-xs">
-                      <div className="flex items-center gap-2 text-yellow-300">
-                        <Zap className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-amber-50/70 border border-amber-200 text-xs">
+                      <div className="flex items-center gap-2 text-amber-800">
+                        <Zap className="w-3.5 h-3.5 text-amber-600 fill-amber-500" />
                         <span>Punto de Oro</span>
                       </div>
-                      <span className="font-bold text-yellow-300 text-[10px] px-2 py-0.5 rounded bg-yellow-400/20">
+                      <span className="font-bold text-amber-800 text-[10px] px-2 py-0.5 rounded bg-amber-100">
                         {lang === 'id' ? 'Golden Point 40-40' : 'Sudden Death at Deuce'}
                       </span>
                     </div>
                   )}
 
                   {/* Lapangan & Pemain */}
-                  <div className="flex items-center justify-between p-2 rounded-xl bg-slate-950/70 border border-slate-800 text-xs">
-                    <div className="flex items-center gap-2 text-slate-300">
-                      <Info className="w-3.5 h-3.5 text-purple-400" />
+                  <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-200/70 text-xs">
+                    <div className="flex items-center gap-2 text-slate-600">
+                      <Info className="w-3.5 h-3.5 text-purple-600" />
                       <span>{lang === 'id' ? 'Kapasitas' : 'Capacity'}</span>
                     </div>
-                    <span className="font-semibold text-slate-200 text-[11px]">
+                    <span className="font-semibold text-slate-900 text-[11px]">
                       {config.courtCount} {lang === 'id' ? 'Lapangan' : 'Courts'} • {activeRecord.players.length} {lang === 'id' ? 'Pemain' : 'Players'}
                     </span>
                   </div>
                 </div>
 
                 {/* Popover Footer with discreet Sign In for logged out users */}
-                <div className="pt-2 text-[10px] text-slate-500 text-center border-t border-slate-800/80 relative z-10 space-y-2">
+                <div className="pt-2 text-[10px] text-slate-500 text-center border-t border-slate-100 relative z-10 space-y-2">
                   <div>
                     {lang === 'id'
                       ? '💡 Arahkan kursor atau atur di menu Setup & Roster'
@@ -1279,7 +1279,7 @@ export function App() {
                     <button
                       type="button"
                       onClick={() => setShowAuthModal(true)}
-                      className="w-full py-1.5 px-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
+                      className="w-full py-1.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                     >
                       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
                         <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.15z"/>
@@ -1310,13 +1310,13 @@ export function App() {
                     prompt(lang === 'id' ? 'Salin link undangan:' : 'Copy invite link:', inviteUrl);
                   });
                 }}
-                className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-emerald-400 border border-slate-800 hover:border-emerald-500/40 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm whitespace-nowrap"
+                className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 hover:text-emerald-700 border border-slate-200 hover:border-emerald-300 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs whitespace-nowrap cursor-pointer"
                 title={t.copyInviteLink}
               >
                 {copiedInviteInRunner ? (
                   <>
-                    <Check className="w-3.5 h-3.5 text-emerald-400" />
-                    <span className="text-emerald-400 text-xs font-bold">{t.inviteLinkCopied}</span>
+                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="text-emerald-700 text-xs font-bold">{t.inviteLinkCopied}</span>
                   </>
                 ) : (
                   <>
@@ -1332,7 +1332,7 @@ export function App() {
               <button
                 type="button"
                 onClick={() => setRequestsModalTourneyId(config.id)}
-                className="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm animate-pulse whitespace-nowrap"
+                className="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs animate-pulse whitespace-nowrap cursor-pointer"
                 title={lang === 'id' ? 'Lihat permohonan join' : 'Review join requests'}
               >
                 <span>🔔</span>
@@ -1353,13 +1353,13 @@ export function App() {
                     prompt('Salin link live score:', shareUrl);
                   });
                 }}
-                className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-emerald-400 border border-slate-800 hover:border-emerald-500/40 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm whitespace-nowrap"
+                className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 hover:text-emerald-700 border border-slate-200 hover:border-emerald-300 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs whitespace-nowrap cursor-pointer"
                 title={lang === 'id' ? 'Salin link live score penonton' : 'Share spectator live score link'}
               >
                 {copiedShareInRunner ? (
                   <>
-                    <Check className="w-3.5 h-3.5 text-emerald-400" />
-                    <span className="text-emerald-400 text-xs font-bold">{t.liveScoreCopied}</span>
+                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="text-emerald-700 text-xs font-bold">{t.liveScoreCopied}</span>
                   </>
                 ) : (
                   <>
@@ -1374,14 +1374,14 @@ export function App() {
             {renderUserAuthButton()}
 
             {/* Language Switcher Pill */}
-            <div className="flex items-center bg-slate-900 border border-slate-800 rounded-xl p-0.5 text-xs font-bold shadow-inner shrink-0">
+            <div className="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-0.5 text-xs font-medium shadow-inner shrink-0">
               <button
                 type="button"
                 onClick={() => setLang('en')}
-                className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
+                className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer ${
                   lang === 'en'
-                    ? 'bg-emerald-500 text-slate-950 font-black shadow-sm shadow-emerald-500/20'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-white text-slate-900 font-semibold shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
                 title="Switch to English"
               >
@@ -1391,10 +1391,10 @@ export function App() {
               <button
                 type="button"
                 onClick={() => setLang('id')}
-                className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
+                className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer ${
                   lang === 'id'
-                    ? 'bg-emerald-500 text-slate-950 font-black shadow-sm shadow-emerald-500/20'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-white text-slate-900 font-semibold shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
                 title="Ganti ke Bahasa Indonesia"
               >
@@ -1408,18 +1408,18 @@ export function App() {
                 <button
                   type="button"
                   onClick={() => setIsSetupOpen(!isSetupOpen)}
-                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"
+                  className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
                 >
-                  <SlidersHorizontal className="w-3.5 h-3.5 text-emerald-400" />
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-emerald-600" />
                   <span>{isSetupOpen ? t.closeSetup : t.setupAndRoster}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setShowPodium(true)}
-                  className="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"
+                  className="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
                 >
-                  <Award className="w-3.5 h-3.5 text-amber-400" />
+                  <Award className="w-3.5 h-3.5 text-amber-600" />
                   <span className="hidden sm:inline">{t.podium}</span>
                 </button>
 
@@ -1430,7 +1430,7 @@ export function App() {
                       handleResetTournament();
                     }
                   }}
-                  className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-700 rounded-xl transition-all"
+                  className="p-1.5 bg-white hover:bg-slate-50 text-slate-500 hover:text-rose-600 border border-slate-200 rounded-xl transition-all shadow-xs cursor-pointer"
                   title={t.resetTourney}
                 >
                   <RotateCcw className="w-4 h-4" />
@@ -1442,9 +1442,9 @@ export function App() {
               <button
                 type="button"
                 onClick={() => setShowPodium(true)}
-                className="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"
+                className="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
               >
-                <Award className="w-3.5 h-3.5 text-amber-400" />
+                <Award className="w-3.5 h-3.5 text-amber-600" />
                 <span className="hidden sm:inline">{t.podium}</span>
               </button>
             )}
@@ -1474,7 +1474,7 @@ export function App() {
           {/* LEFT COLUMN: Matches & Round Controls (8 of 12 cols = 67%) */}
           <div className="lg:col-span-8 space-y-5">
             {/* Round Navigation Bar */}
-            <div className="glass-panel p-3 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div className="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               {/* Round Tabs */}
               <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
                 {rounds.map((r, idx) => {
@@ -1486,16 +1486,16 @@ export function App() {
                       key={idx}
                       type="button"
                       onClick={() => setActiveTabRound(idx)}
-                      className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+                      className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ${
                         isSelected
-                          ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+                          ? 'bg-emerald-600 text-white shadow-xs'
                           : isCompleted
-                          ? 'bg-slate-800 text-slate-300 border border-slate-700'
-                          : 'bg-slate-950/60 text-slate-400 border border-slate-800'
+                          ? 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border border-slate-200'
+                          : 'bg-white hover:bg-slate-50 text-slate-600 border border-slate-200'
                       }`}
                     >
                       <span>{t.roundLabel(idx + 1)}</span>
-                      {isCompleted && <span className="text-[10px]">✓</span>}
+                      {isCompleted && <span className="text-[10px] text-emerald-600 font-bold">✓</span>}
                     </button>
                   );
                 })}
@@ -1505,14 +1505,14 @@ export function App() {
               {!isSpectatorMode && isViewingLatestRound && (
                 <div className="flex items-center gap-2">
                   {allMatchesCompleted && (
-                    <span className="text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg hidden sm:inline">
+                    <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg hidden sm:inline">
                       {t.allScoresVerified}
                     </span>
                   )}
                   <button
                     type="button"
                     onClick={handleGenerateNextRound}
-                    className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-extrabold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/20 transition-all shrink-0"
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-all shrink-0 cursor-pointer"
                   >
                     <span>{t.nextRoundBtn(rounds.length + 1)}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -1521,8 +1521,8 @@ export function App() {
               )}
 
               {isSpectatorMode && (
-                <div className="text-xs text-amber-400 font-bold flex items-center gap-1.5 px-2">
-                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                <div className="text-xs text-amber-700 font-bold flex items-center gap-1.5 px-2">
+                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
                   <span>{t.spectatorModeTitle}</span>
                 </div>
               )}
@@ -1530,20 +1530,20 @@ export function App() {
 
             {/* Bench / Resting Players Banner */}
             {benchNames.length > 0 && (
-              <div className="p-3.5 rounded-2xl bg-gradient-to-r from-blue-950/40 via-indigo-950/30 to-slate-900 border border-blue-500/30 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="p-3.5 rounded-2xl bg-blue-50/80 border border-blue-200/80 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/40 flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-700 border border-blue-200 flex items-center justify-center shrink-0">
                     <Coffee className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-blue-400">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-blue-800">
                       {t.restingBannerTitle(currentRound?.roundNumber || 1)}
                     </div>
-                    <div className="text-xs font-bold text-white flex items-center gap-1.5 mt-0.5 flex-wrap">
+                    <div className="text-xs font-semibold text-slate-900 flex items-center gap-1.5 mt-0.5 flex-wrap">
                       {benchNames.map((name, i) => (
                         <span
                           key={i}
-                          className="px-2 py-0.5 rounded bg-blue-900/50 border border-blue-700/50 text-blue-200"
+                          className="px-2.5 py-0.5 rounded-lg bg-white border border-blue-200 text-blue-900 shadow-2xs font-medium"
                         >
                           {name}
                         </span>
@@ -1552,7 +1552,7 @@ export function App() {
                   </div>
                 </div>
 
-                <div className="text-[10px] text-blue-300/80 font-medium">
+                <div className="text-[11px] text-blue-700 font-medium">
                   {t.fairRestNote}
                 </div>
               </div>
@@ -1560,7 +1560,7 @@ export function App() {
 
             {/* Court Match Cards Grid */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between text-xs font-bold text-slate-400 px-1">
+              <div className="flex items-center justify-between text-xs font-bold text-slate-700 px-1">
                 <span>{t.courtMatchesTitle(currentRound?.roundNumber || 1)}</span>
                 <span className="text-[11px] font-normal text-slate-500">
                   {config.scoringSystem === 'fixed_points'

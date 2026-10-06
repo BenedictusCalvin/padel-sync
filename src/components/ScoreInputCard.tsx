@@ -96,51 +96,52 @@ export const ScoreInputCard: React.FC<ScoreInputCardProps> = ({
 
   return (
     <div
-      className={`rounded-2xl transition-all duration-300 border relative overflow-hidden ${
+      className={`rounded-2xl transition-all duration-200 border p-5 shadow-sm relative overflow-hidden ${
         isKing
-          ? 'king-court-glow bg-gradient-to-b from-amber-950/20 via-slate-900/95 to-slate-950 border-amber-500/50'
+          ? 'bg-gradient-to-b from-amber-50/40 via-white to-white border-amber-300 ring-1 ring-amber-200'
           : match.completed
-          ? 'bg-slate-900/90 border-slate-700/80 shadow-lg'
-          : 'glass-panel border-slate-800 hover:border-slate-700 shadow-xl'
+          ? 'bg-slate-50/60 border-slate-200'
+          : 'bg-white border-slate-200/90 hover:border-slate-300'
       }`}
     >
       {/* Court Header Banner */}
-      <div className="px-4 py-2.5 border-b border-slate-800/80 flex items-center justify-between bg-slate-950/50">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-slate-100">
+        <div className="flex items-center gap-2 flex-wrap">
           {isKing ? (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold tracking-wide">
-              <Crown className="w-3.5 h-3.5 text-amber-400" />
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold tracking-wide shadow-2xs">
+              <Crown className="w-3.5 h-3.5 text-amber-600" />
               <span>KING COURT 1</span>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700 text-slate-300 text-xs font-bold">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200/80 text-slate-700 text-xs font-bold">
               <span>{match.courtName || `Court ${match.courtId}`}</span>
             </div>
           )}
 
           {/* Scoring rule indicator badge */}
-          <span className="text-[11px] font-mono text-emerald-400 px-2 py-0.5 rounded bg-emerald-950/40 border border-emerald-800/40">
+          <span className="text-[11px] font-medium font-mono text-emerald-700 px-2 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200/70">
             {isFixedPoints && `Fixed ${config.targetPoints} Pts`}
             {isTotalGames && `Total ${config.totalGamesTarget} Games`}
             {isRaceToGames && `Race to ${config.raceToGamesTarget} Games`}
           </span>
 
           {config.goldenPoint && (
-            <span className="text-[10px] font-semibold text-amber-400 px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 hidden sm:inline">
+            <span className="text-[10px] font-semibold text-amber-700 px-1.5 py-0.5 rounded bg-amber-50 border border-amber-200/80 hidden sm:inline">
               Punto de Oro
             </span>
           )}
         </div>
 
+        {/* Verification Status */}
         {isReadOnly ? (
           match.completed ? (
-            <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
               <Check className="w-3.5 h-3.5" />
               <span>{t.verifiedBtn}</span>
             </span>
           ) : (
-            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
               <span>LIVE</span>
             </span>
           )
@@ -148,10 +149,10 @@ export const ScoreInputCard: React.FC<ScoreInputCardProps> = ({
           <button
             type="button"
             onClick={() => onToggleComplete(match.id)}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs ${
               match.completed
-                ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
-                : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'
+                ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
             }`}
           >
             <Check className="w-3.5 h-3.5" />
@@ -161,68 +162,77 @@ export const ScoreInputCard: React.FC<ScoreInputCardProps> = ({
       </div>
 
       {/* Main Teams & Score Board */}
-      <div className="p-4">
-        <div className="grid grid-cols-7 gap-2 items-center">
+      <div>
+        <div className="grid grid-cols-7 gap-2.5 items-center">
           {/* TEAM A (Cols 3) */}
           <div
-            className={`col-span-3 p-3 rounded-xl border transition-all ${
+            className={`col-span-3 p-3.5 rounded-2xl border transition-all ${
               isTeamAWinner && match.completed
-                ? 'bg-emerald-950/30 border-emerald-500/50 shadow-md shadow-emerald-500/10'
-                : 'bg-slate-900/70 border-slate-800/90'
+                ? 'bg-emerald-50/80 border-emerald-300 ring-1 ring-emerald-200 shadow-xs'
+                : 'bg-slate-50/70 border-slate-200/80'
             }`}
           >
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 truncate">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 truncate">
                 {match.teamA.name || t.teamA}
               </span>
               {isTeamAWinner && match.completed && (
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 flex items-center gap-0.5">
-                  <Trophy className="w-3 h-3 text-emerald-400" />
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 flex items-center gap-0.5">
+                  <Trophy className="w-3 h-3 text-emerald-600" />
                   {t.winBadge}
                 </span>
               )}
             </div>
 
             {/* Players in Team A */}
-            <div className="space-y-0.5 mb-2.5 min-h-[38px]">
-              <div className="text-xs sm:text-sm font-semibold text-white truncate">{p1A}</div>
-              {p2A && <div className="text-xs sm:text-sm font-semibold text-slate-300 truncate">{p2A}</div>}
+            <div className="space-y-0.5 mb-3 min-h-[42px]">
+              <div className="text-sm sm:text-base font-semibold text-slate-900 truncate leading-tight">
+                {p1A}
+              </div>
+              {p2A && (
+                <div className="text-xs sm:text-sm font-medium text-slate-600 truncate leading-tight">
+                  {p2A}
+                </div>
+              )}
             </div>
 
             {/* King of the court movement */}
             {config.format === 'king_of_the_court' && (
-              <div className="text-[10px] font-medium mb-2 flex items-center gap-1">
+              <div className="text-[10px] font-semibold mb-2 flex items-center gap-1">
                 {isTeamAWinner ? (
-                  <span className="text-emerald-400 flex items-center gap-0.5">
+                  <span className="text-emerald-700 flex items-center gap-0.5">
                     <ArrowUp className="w-3 h-3" /> {t.kingPromote(Math.max(1, match.courtId - 1))}
                   </span>
                 ) : (
-                  <span className="text-amber-400/80 flex items-center gap-0.5">
+                  <span className="text-amber-700 flex items-center gap-0.5">
                     <ArrowDown className="w-3 h-3" /> {t.kingRelegate(match.courtId + 1)}
                   </span>
                 )}
               </div>
             )}
 
-            {/* Stepper & Number */}
+            {/* Scoreboard Stepper & Number */}
             {isReadOnly ? (
-              <div className="py-1 text-center bg-slate-950/80 rounded-lg border border-slate-800">
-                <div className="text-3xl font-black font-mono text-emerald-400">
+              <div className="py-2 text-center bg-white rounded-xl border border-slate-200 shadow-2xs">
+                <div className="text-3xl font-bold font-mono tabular-nums text-slate-900">
                   {scoreA}
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-between gap-1 bg-slate-950/80 p-1 rounded-lg border border-slate-800">
+              <div className="flex items-center justify-between gap-1 bg-white p-1 rounded-xl border border-slate-200 shadow-2xs">
                 <button
                   type="button"
                   onClick={() => handleUpdateTeamA(scoreA - 1)}
                   disabled={scoreA <= 0}
-                  className="w-8 h-8 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-white flex items-center justify-center font-bold text-sm"
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:hover:bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-sm cursor-pointer transition-colors"
+                  aria-label="Decrease score A"
                 >
-                  <Minus className="w-3.5 h-3.5" />
+                  <Minus className="w-3.5 h-3.5 stroke-[2.5]" />
                 </button>
 
-                <div className="text-2xl font-black font-mono text-emerald-400 text-center flex-1">
+                <div className={`text-3xl font-bold font-mono tabular-nums text-center flex-1 ${
+                  scoreA > scoreB ? 'text-emerald-600' : 'text-slate-900'
+                }`}>
                   {scoreA}
                 </div>
 
@@ -230,9 +240,10 @@ export const ScoreInputCard: React.FC<ScoreInputCardProps> = ({
                   type="button"
                   onClick={() => handleUpdateTeamA(scoreA + 1)}
                   disabled={isComplementary && scoreA >= targetLimit}
-                  className="w-8 h-8 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-white flex items-center justify-center font-bold text-sm"
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:hover:bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-sm cursor-pointer transition-colors"
+                  aria-label="Increase score A"
                 >
-                  <Plus className="w-3.5 h-3.5" />
+                  <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                 </button>
               </div>
             )}
@@ -240,72 +251,81 @@ export const ScoreInputCard: React.FC<ScoreInputCardProps> = ({
 
           {/* VS Divider (Col 1) */}
           <div className="col-span-1 flex flex-col items-center justify-center">
-            <span className="text-xs font-black text-slate-500 tracking-widest">VS</span>
-            <span className="text-[10px] text-slate-600 font-mono mt-1 text-center">
+            <span className="text-xs font-black text-slate-400 tracking-wider">VS</span>
+            <span className="text-[10px] text-slate-500 font-mono mt-1 text-center font-medium">
               {isComplementary ? `${scoreA + scoreB}/${targetLimit}` : 'Games'}
             </span>
           </div>
 
           {/* TEAM B (Cols 3) */}
           <div
-            className={`col-span-3 p-3 rounded-xl border transition-all ${
+            className={`col-span-3 p-3.5 rounded-2xl border transition-all ${
               isTeamBWinner && match.completed
-                ? 'bg-cyan-950/30 border-cyan-500/50 shadow-md shadow-cyan-500/10'
-                : 'bg-slate-900/70 border-slate-800/90'
+                ? 'bg-sky-50/80 border-sky-300 ring-1 ring-sky-200 shadow-xs'
+                : 'bg-slate-50/70 border-slate-200/80'
             }`}
           >
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-cyan-400 truncate">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-sky-700 truncate">
                 {match.teamB.name || t.teamB}
               </span>
               {isTeamBWinner && match.completed && (
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 flex items-center gap-0.5">
-                  <Trophy className="w-3 h-3 text-cyan-400" />
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-sky-100 text-sky-800 flex items-center gap-0.5">
+                  <Trophy className="w-3 h-3 text-sky-600" />
                   {t.winBadge}
                 </span>
               )}
             </div>
 
             {/* Players in Team B */}
-            <div className="space-y-0.5 mb-2.5 min-h-[38px]">
-              <div className="text-xs sm:text-sm font-semibold text-white truncate">{p1B}</div>
-              {p2B && <div className="text-xs sm:text-sm font-semibold text-slate-300 truncate">{p2B}</div>}
+            <div className="space-y-0.5 mb-3 min-h-[42px]">
+              <div className="text-sm sm:text-base font-semibold text-slate-900 truncate leading-tight">
+                {p1B}
+              </div>
+              {p2B && (
+                <div className="text-xs sm:text-sm font-medium text-slate-600 truncate leading-tight">
+                  {p2B}
+                </div>
+              )}
             </div>
 
             {/* King of the court movement */}
             {config.format === 'king_of_the_court' && (
-              <div className="text-[10px] font-medium mb-2 flex items-center gap-1">
+              <div className="text-[10px] font-semibold mb-2 flex items-center gap-1">
                 {isTeamBWinner ? (
-                  <span className="text-cyan-400 flex items-center gap-0.5">
+                  <span className="text-sky-700 flex items-center gap-0.5">
                     <ArrowUp className="w-3 h-3" /> {t.kingPromote(Math.max(1, match.courtId - 1))}
                   </span>
                 ) : (
-                  <span className="text-amber-400/80 flex items-center gap-0.5">
+                  <span className="text-amber-700 flex items-center gap-0.5">
                     <ArrowDown className="w-3 h-3" /> {t.kingRelegate(match.courtId + 1)}
                   </span>
                 )}
               </div>
             )}
 
-            {/* Stepper & Number */}
+            {/* Scoreboard Stepper & Number */}
             {isReadOnly ? (
-              <div className="py-1 text-center bg-slate-950/80 rounded-lg border border-slate-800">
-                <div className="text-3xl font-black font-mono text-cyan-400">
+              <div className="py-2 text-center bg-white rounded-xl border border-slate-200 shadow-2xs">
+                <div className="text-3xl font-bold font-mono tabular-nums text-slate-900">
                   {scoreB}
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-between gap-1 bg-slate-950/80 p-1 rounded-lg border border-slate-800">
+              <div className="flex items-center justify-between gap-1 bg-white p-1 rounded-xl border border-slate-200 shadow-2xs">
                 <button
                   type="button"
                   onClick={() => handleUpdateTeamB(scoreB - 1)}
                   disabled={scoreB <= 0}
-                  className="w-8 h-8 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-white flex items-center justify-center font-bold text-sm"
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:hover:bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-sm cursor-pointer transition-colors"
+                  aria-label="Decrease score B"
                 >
-                  <Minus className="w-3.5 h-3.5" />
+                  <Minus className="w-3.5 h-3.5 stroke-[2.5]" />
                 </button>
 
-                <div className="text-2xl font-black font-mono text-cyan-400 text-center flex-1">
+                <div className={`text-3xl font-bold font-mono tabular-nums text-center flex-1 ${
+                  scoreB > scoreA ? 'text-sky-600' : 'text-slate-900'
+                }`}>
                   {scoreB}
                 </div>
 
@@ -313,9 +333,10 @@ export const ScoreInputCard: React.FC<ScoreInputCardProps> = ({
                   type="button"
                   onClick={() => handleUpdateTeamB(scoreB + 1)}
                   disabled={isComplementary && scoreB >= targetLimit}
-                  className="w-8 h-8 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-white flex items-center justify-center font-bold text-sm"
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:hover:bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-sm cursor-pointer transition-colors"
+                  aria-label="Increase score B"
                 >
-                  <Plus className="w-3.5 h-3.5" />
+                  <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                 </button>
               </div>
             )}
@@ -323,37 +344,42 @@ export const ScoreInputCard: React.FC<ScoreInputCardProps> = ({
         </div>
 
         {/* Visual Progress Bar & Score Quick Presets */}
-        <div className="mt-3 pt-2.5 border-t border-slate-800/80">
+        <div className="mt-3.5 pt-3 border-t border-slate-100">
           {isComplementary && (
-            <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden flex mb-2">
+            <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden flex mb-2.5">
               <div
                 className="bg-emerald-500 h-full transition-all duration-300"
                 style={{ width: `${(scoreA / (targetLimit || 1)) * 100}%` }}
               />
               <div
-                className="bg-cyan-500 h-full transition-all duration-300"
+                className="bg-sky-500 h-full transition-all duration-300"
                 style={{ width: `${(scoreB / (targetLimit || 1)) * 100}%` }}
               />
             </div>
           )}
 
-          <div className="flex items-center justify-between gap-1">
-            <span className="text-[10px] text-slate-500 font-semibold uppercase">{t.shortcuts}</span>
-            <div className="flex gap-1 overflow-x-auto">
-              {presetRatios.map((item, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => onScoreChange(match.id, item.a, item.b)}
-                  className={`px-2 py-0.5 rounded text-[11px] font-mono border transition-all ${
-                    scoreA === item.a && scoreB === item.b
-                      ? 'bg-emerald-500/20 border-emerald-500/60 text-emerald-300 font-bold'
-                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+              {t.shortcuts}
+            </span>
+            <div className="flex gap-1.5 overflow-x-auto py-0.5">
+              {presetRatios.map((item, idx) => {
+                const isSelected = scoreA === item.a && scoreB === item.b;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => onScoreChange(match.id, item.a, item.b)}
+                    className={`py-1 px-2.5 rounded-lg text-xs font-mono font-medium border transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-emerald-50 border-emerald-300 text-emerald-800 font-bold shadow-2xs'
+                        : 'bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 text-slate-600 border-slate-200/60'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
