@@ -774,7 +774,7 @@ export function App() {
         <button
           type="button"
           onClick={() => setShowAuthModal(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-bold text-xs rounded-xl shadow-md shadow-emerald-500/10 transition-all shrink-0"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs rounded-xl shadow-xs transition-all shrink-0 cursor-pointer"
         >
           <LogIn className="w-3.5 h-3.5" />
           <span>{t.signIn}</span>
@@ -786,27 +786,27 @@ export function App() {
       <button
         type="button"
         onClick={() => setShowAuthModal(true)}
-        className="flex items-center gap-2 p-1 pr-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/40 rounded-xl transition-all shadow-sm shrink-0"
+        className="flex items-center gap-2 p-1 pr-2.5 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-xl transition-all shadow-xs shrink-0 cursor-pointer"
         title={`${t.loggedInAs}: ${user.email}`}
       >
         {user.user_metadata?.avatar_url ? (
           <img
             src={user.user_metadata.avatar_url}
             alt={user.email || 'User'}
-            className="w-6 h-6 rounded-lg object-cover border border-emerald-400/60"
+            className="w-6 h-6 rounded-lg object-cover border border-emerald-500/40"
           />
         ) : (
-          <div className="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
+          <div className="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs border border-emerald-200/80">
             {user.email?.[0]?.toUpperCase() || 'U'}
           </div>
         )}
-        <span className="text-xs font-semibold text-slate-200 hidden sm:inline max-w-[100px] truncate">
+        <span className="text-xs font-semibold text-slate-800 hidden sm:inline max-w-[100px] truncate">
           {user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0]}
         </span>
         {isSyncing ? (
-          <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" title={t.syncingToCloud} />
+          <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" title={t.syncingToCloud} />
         ) : (
-          <span className="w-2 h-2 rounded-full bg-emerald-400" title={t.cloudSynced} />
+          <span className="w-2 h-2 rounded-full bg-emerald-500" title={t.cloudSynced} />
         )}
       </button>
     );
@@ -850,19 +850,19 @@ export function App() {
   // =========================================================================
   if (!activeTournamentId || !activeRecord) {
     return (
-      <div className="min-h-screen bg-[#080c14] text-slate-100 flex flex-col font-sans pb-12">
-        <header className="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40">
+      <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans pb-12">
+        <header className="border-b border-slate-200/80 bg-white/80 backdrop-blur-md sticky top-0 z-40 shadow-xs">
           <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-emerald-400 font-bold text-base">
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center font-bold text-base">
                 ⚡
               </div>
               <div>
-                <div className="font-bold text-base text-white tracking-wider flex items-center gap-1 leading-none">
+                <div className="font-bold text-base text-slate-900 tracking-wider flex items-center gap-1 leading-none">
                   <span>PDL</span>
-                  <span className="text-emerald-400 font-extrabold">UP</span>
+                  <span className="text-emerald-600 font-extrabold">UP</span>
                 </div>
-                <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mt-0.5">
+                <div className="text-[10px] text-slate-500 font-medium uppercase tracking-wider mt-0.5">
                   {t.multiHubSubtitle}
                 </div>
               </div>
@@ -873,14 +873,14 @@ export function App() {
               {renderUserAuthButton()}
 
               {/* Language Switcher Pill */}
-              <div className="flex items-center bg-slate-900 border border-slate-800 rounded-xl p-0.5 text-xs font-medium shadow-inner">
+              <div className="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-0.5 text-xs font-medium shadow-inner">
                 <button
                   type="button"
                   onClick={() => setLang('en')}
-                  className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
+                  className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer ${
                     lang === 'en'
-                      ? 'bg-emerald-500 text-slate-950 font-semibold shadow-sm'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-white text-slate-900 font-semibold shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                   title="Switch to English"
                 >
@@ -890,10 +890,10 @@ export function App() {
                 <button
                   type="button"
                   onClick={() => setLang('id')}
-                  className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
+                  className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer ${
                     lang === 'id'
-                      ? 'bg-emerald-500 text-slate-950 font-semibold shadow-sm'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-white text-slate-900 font-semibold shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                   title="Ganti ke Bahasa Indonesia"
                 >
@@ -901,7 +901,7 @@ export function App() {
                 </button>
               </div>
 
-              <span className="hidden sm:inline px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-slate-300 text-xs font-medium">
+              <span className="hidden sm:inline px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 text-xs font-medium shadow-xs">
                 {t.activeTournamentsCount(visibleTournamentsCount)}
               </span>
             </div>

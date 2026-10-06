@@ -103,7 +103,7 @@ export const JoinInviteModal: React.FC<JoinInviteModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-fadeIn">
       <div
         className="w-full max-w-lg bg-[#0c1220] border border-slate-800 rounded-3xl shadow-2xl overflow-hidden relative"
         onClick={(e) => e.stopPropagation()}

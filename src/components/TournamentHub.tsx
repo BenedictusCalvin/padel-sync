@@ -288,13 +288,13 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 animate-fadeIn">
       {/* Top Banner / Hero */}
-      <div className="p-6 sm:p-8 rounded-2xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-md relative overflow-hidden">
+      <div className="p-6 sm:p-8 rounded-2xl bg-white border border-slate-200/80 shadow-sm relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
           <div className="space-y-1.5">
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-100 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
               {t.hubTitle}
             </h1>
-            <p className="text-slate-400 text-sm max-w-xl leading-relaxed">
+            <p className="text-slate-500 text-sm max-w-xl leading-relaxed">
               {t.hubSubtitle}
             </p>
           </div>
@@ -302,7 +302,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
           <button
             type="button"
             onClick={handleOpenCreateModal}
-            className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-sm rounded-xl shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-95 shrink-0"
+            className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm rounded-xl shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-95 shrink-0"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
             <span>{t.createNewTournament}</span>
@@ -310,38 +310,46 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
         </div>
 
         {/* Global Statistics Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-5 border-t border-slate-800/60">
-          <div className="p-3 bg-slate-950/40 rounded-xl border border-slate-800/60">
-            <div className="text-xs text-slate-400 flex items-center gap-1.5 mb-1 font-medium">
-              <Trophy className="w-3.5 h-3.5 text-amber-400/90" />
-              <span>{t.totalTournaments}</span>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-5 border-t border-slate-100">
+          <div className="p-3.5 bg-slate-50/70 rounded-xl border border-slate-200/80 flex flex-col justify-between">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                <Trophy className="w-4 h-4" />
+              </div>
+              <span className="text-xs text-slate-500 font-medium">{t.totalTournaments}</span>
             </div>
-            <div className="text-xl font-semibold text-slate-100">{visibleTournaments.length}</div>
+            <div className="text-xl font-bold text-slate-900">{visibleTournaments.length}</div>
           </div>
 
-          <div className="p-3 bg-slate-950/40 rounded-xl border border-slate-800/60">
-            <div className="text-xs text-slate-400 flex items-center gap-1.5 mb-1 font-medium">
-              <Layers className="w-3.5 h-3.5 text-emerald-400/90" />
-              <span>{t.activeCourts}</span>
+          <div className="p-3.5 bg-slate-50/70 rounded-xl border border-slate-200/80 flex flex-col justify-between">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                <Layers className="w-4 h-4" />
+              </div>
+              <span className="text-xs text-slate-500 font-medium">{t.activeCourts}</span>
             </div>
-            <div className="text-xl font-semibold text-slate-100">{totalCourtsInUse}</div>
+            <div className="text-xl font-bold text-slate-900">{totalCourtsInUse}</div>
           </div>
 
-          <div className="p-3 bg-slate-950/40 rounded-xl border border-slate-800/60">
-            <div className="text-xs text-slate-400 flex items-center gap-1.5 mb-1 font-medium">
-              <Users className="w-3.5 h-3.5 text-sky-400/90" />
-              <span>{t.registeredPlayers}</span>
+          <div className="p-3.5 bg-slate-50/70 rounded-xl border border-slate-200/80 flex flex-col justify-between">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-7 h-7 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+                <Users className="w-4 h-4" />
+              </div>
+              <span className="text-xs text-slate-500 font-medium">{t.registeredPlayers}</span>
             </div>
-            <div className="text-xl font-semibold text-slate-100">{totalActivePlayers}</div>
+            <div className="text-xl font-bold text-slate-900">{totalActivePlayers}</div>
           </div>
 
-          <div className="p-3 bg-slate-950/40 rounded-xl border border-slate-800/60">
-            <div className="text-xs text-slate-400 flex items-center gap-1.5 mb-1 font-medium">
-              <Clock className="w-3.5 h-3.5 text-indigo-400/90" />
-              <span>{t.engineStatus}</span>
+          <div className="p-3.5 bg-slate-50/70 rounded-xl border border-slate-200/80 flex flex-col justify-between">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                <Clock className="w-4 h-4" />
+              </div>
+              <span className="text-xs text-slate-500 font-medium">{t.engineStatus}</span>
             </div>
-            <div className="text-sm font-medium text-slate-200 mt-1 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500/80" />
+            <div className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
               <span>{t.readyToMatch}</span>
             </div>
           </div>
@@ -364,21 +372,21 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold text-slate-100 tracking-tight">{t.activeTournamentsList}</h2>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-slate-400 font-medium">
+                <h2 className="text-lg font-bold text-slate-900 tracking-tight">{t.activeTournamentsList}</h2>
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-600 font-medium">
                   {t.sessionsCount(visibleTournaments.length)}
                 </span>
               </div>
 
               {/* Visibility Filter Tabs */}
-              <div className="flex items-center gap-1 bg-slate-950/60 border border-slate-800/80 p-0.5 rounded-xl self-start sm:self-auto text-xs">
+              <div className="flex items-center gap-1 bg-slate-100 border border-slate-200/80 p-0.5 rounded-xl self-start sm:self-auto text-xs">
                 <button
                   type="button"
                   onClick={() => setVisibilityFilter('all')}
-                  className={`px-3 py-1 rounded-lg font-medium transition-all cursor-pointer ${
+                  className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
                     visibilityFilter === 'all'
-                      ? 'bg-slate-800 text-slate-100 shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-white text-slate-900 font-semibold shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 font-medium'
                   }`}
                 >
                   {t.filterAll} ({visibleTournaments.length})
@@ -386,26 +394,26 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                 <button
                   type="button"
                   onClick={() => setVisibilityFilter('public')}
-                  className={`px-3 py-1 rounded-lg font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
                     visibilityFilter === 'public'
-                      ? 'bg-slate-800 text-emerald-400 shadow-sm'
-                      : 'text-slate-400 hover:text-emerald-400'
+                      ? 'bg-white text-emerald-700 font-semibold shadow-xs'
+                      : 'text-slate-600 hover:text-emerald-700 font-medium'
                   }`}
                 >
-                  <Globe className="w-3.5 h-3.5 text-emerald-500/80" />
+                  <Globe className="w-3.5 h-3.5 text-emerald-600" />
                   <span>{t.filterPublic} ({publicCount})</span>
                 </button>
                 {Boolean(user && privateCount > 0) && (
                   <button
                     type="button"
                     onClick={() => setVisibilityFilter('private')}
-                    className={`px-3 py-1 rounded-lg font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
+                    className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
                       visibilityFilter === 'private'
-                        ? 'bg-slate-800 text-amber-400 shadow-sm'
-                        : 'text-slate-400 hover:text-amber-300'
+                        ? 'bg-white text-amber-700 font-semibold shadow-xs'
+                        : 'text-slate-600 hover:text-amber-700 font-medium'
                     }`}
                   >
-                    <Lock className="w-3.5 h-3.5 text-amber-500/80" />
+                    <Lock className="w-3.5 h-3.5 text-amber-600" />
                     <span>{t.filterPrivate} ({privateCount})</span>
                   </button>
                 )}
@@ -413,16 +421,16 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
             </div>
 
             {filteredTournaments.length === 0 ? (
-              <div className="p-10 rounded-2xl bg-slate-900/40 border border-slate-800/80 text-center space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-slate-800/80 text-slate-400 flex items-center justify-center mx-auto text-xl">
+              <div className="p-10 rounded-2xl bg-white border border-slate-200/80 text-center space-y-4 shadow-sm">
+                <div className="w-12 h-12 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center mx-auto text-xl">
                   {visibilityFilter === 'private' ? '🔒' : '🎾'}
                 </div>
-                <h3 className="text-base font-semibold text-slate-100">
+                <h3 className="text-base font-semibold text-slate-900">
                   {visibilityFilter === 'private'
                     ? (lang === 'id' ? 'Belum Ada Turnamen Private' : 'No Private Tournaments')
                     : t.noTournamentsTitle}
                 </h3>
-                <p className="text-slate-400 text-xs max-w-sm mx-auto leading-relaxed">
+                <p className="text-slate-500 text-xs max-w-sm mx-auto leading-relaxed">
                   {visibilityFilter === 'private'
                     ? (lang === 'id' ? 'Buat turnamen baru dan pilih status Private untuk peserta terdaftar saja.' : 'Create a new tournament and choose Private for registered players only.')
                     : t.noTournamentsDesc}
@@ -430,7 +438,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                 <button
                   type="button"
                   onClick={handleOpenCreateModal}
-                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-xs rounded-xl inline-flex items-center gap-2 shadow-sm transition-all cursor-pointer"
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs rounded-xl inline-flex items-center gap-2 shadow-xs transition-all cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>{t.createFirstTourney}</span>
@@ -458,12 +466,12 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                   return (
                     <div
                       key={tourney.id}
-                      className="rounded-2xl border border-slate-800/80 hover:border-slate-700 bg-slate-900/40 hover:bg-slate-900/60 transition-all duration-200 shadow-lg flex flex-col justify-between group overflow-hidden"
+                      className="rounded-2xl border border-slate-200/80 hover:border-slate-300 bg-white hover:bg-slate-50/40 transition-all duration-200 shadow-sm hover:shadow-md flex flex-col justify-between group overflow-hidden"
                     >
                       {/* Card Header (CLICKABLE TO OPEN MATCHMAKER) */}
                       <div
                         onClick={() => onSelectTournament(tourney.id)}
-                        className="p-4 border-b border-slate-800/60 bg-slate-950/30 cursor-pointer transition-colors"
+                        className="p-4 border-b border-slate-100 bg-white cursor-pointer transition-colors"
                       >
                         <div className="flex items-start justify-between gap-3 mb-2.5">
                           <h3
@@ -471,7 +479,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                               e.stopPropagation();
                               onSelectTournament(tourney.id);
                             }}
-                            className="font-semibold text-slate-100 text-base group-hover:text-emerald-400 transition-colors line-clamp-1 cursor-pointer"
+                            className="font-semibold text-slate-900 text-base group-hover:text-emerald-700 transition-colors line-clamp-1 cursor-pointer"
                             title={tourney.name}
                           >
                             {tourney.name}
@@ -484,7 +492,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                                 onDeleteTournament(tourney.id);
                               }
                             }}
-                            className="text-slate-500 hover:text-red-400 p-1 rounded-lg opacity-40 group-hover:opacity-100 transition-opacity cursor-pointer shrink-0"
+                            className="text-slate-400 hover:text-red-600 p-1 rounded-lg opacity-40 group-hover:opacity-100 transition-opacity cursor-pointer shrink-0"
                             title="Delete Tournament"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -494,7 +502,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                         {/* Format & Visibility (Max 2 concise items) */}
                         <div className="flex items-center justify-between gap-2">
                           {/* 1. Combined Neutral Format Tag */}
-                          <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-md bg-slate-800/80 border border-slate-700/50 text-slate-300 truncate">
+                          <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 truncate">
                             {formatSummary}
                           </span>
 
@@ -507,7 +515,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                                   e.stopPropagation();
                                   onOpenRequestsModal?.(tourney.id);
                                 }}
-                                className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 flex items-center gap-1 transition-colors cursor-pointer"
+                                className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 flex items-center gap-1 transition-colors cursor-pointer"
                                 title={lang === 'id' ? 'Tinjau permintaan gabung' : 'Review join requests'}
                               >
                                 <span>🔔</span>
@@ -524,19 +532,19 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                               }}
                               className={`text-[11px] font-medium px-2 py-0.5 rounded-md border flex items-center gap-1 transition-colors cursor-pointer ${
                                 isPrivate
-                                  ? 'bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/20 text-amber-400/90'
-                                  : 'bg-emerald-500/10 hover:bg-emerald-500/20 border-emerald-500/20 text-emerald-400/90'
+                                  ? 'bg-amber-50 hover:bg-amber-100/70 border-amber-200 text-amber-700'
+                                  : 'bg-emerald-50 hover:bg-emerald-100/70 border-emerald-200 text-emerald-700'
                               }`}
                               title={lang === 'id' ? 'Klik untuk ubah status Publik / Privat' : 'Click to toggle Public / Private'}
                             >
                               {isPrivate ? (
                                 <>
-                                  <Lock className="w-3 h-3 text-amber-400" />
+                                  <Lock className="w-3 h-3 text-amber-600" />
                                   <span>Private</span>
                                 </>
                               ) : (
                                 <>
-                                  <Globe className="w-3 h-3 text-emerald-400" />
+                                  <Globe className="w-3 h-3 text-emerald-600" />
                                   <span>Public</span>
                                 </>
                               )}
@@ -551,42 +559,42 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                         className="p-4 space-y-3 cursor-pointer"
                       >
                         <div className="grid grid-cols-2 gap-2 text-xs">
-                          <div className="p-2.5 bg-slate-950/40 rounded-xl border border-slate-800/60">
-                            <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                          <div className="p-2.5 bg-slate-50/80 rounded-xl border border-slate-100">
+                            <span className="text-slate-500 block text-[10px] uppercase font-medium">
                               {t.activeCourts}
                             </span>
-                            <span className="font-semibold text-slate-200 text-sm">
+                            <span className="font-bold text-slate-900 text-sm">
                               {t.courtCountLabel(tourney.config.courtCount)}
                             </span>
                           </div>
-                          <div className="p-2.5 bg-slate-950/40 rounded-xl border border-slate-800/60">
-                            <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                          <div className="p-2.5 bg-slate-50/80 rounded-xl border border-slate-100">
+                            <span className="text-slate-500 block text-[10px] uppercase font-medium">
                               {t.registeredPlayers}
                             </span>
-                            <span className="font-semibold text-slate-200 text-sm">
+                            <span className="font-bold text-slate-900 text-sm">
                               {t.participantsCount(tourney.players.length, isFixedPair)}
                             </span>
                           </div>
                         </div>
 
                         {/* Leader Preview */}
-                        <div className="p-2.5 bg-slate-950/40 rounded-xl border border-slate-800/60 flex items-center justify-between">
+                        <div className="p-2.5 bg-slate-50/80 rounded-xl border border-slate-100 flex items-center justify-between">
                           <div className="flex items-center gap-2 min-w-0">
-                            <Crown className="w-4 h-4 text-amber-400/80 shrink-0" />
+                            <Crown className="w-4 h-4 text-amber-500 shrink-0" />
                             <div className="min-w-0">
-                              <span className="text-[10px] text-slate-400 font-medium block uppercase tracking-wider">
+                              <span className="text-[10px] text-slate-500 font-medium block uppercase tracking-wider">
                                 {t.temporaryRank1}
                               </span>
-                              <span className="font-medium text-slate-200 text-xs truncate block">
+                              <span className="font-semibold text-slate-800 text-xs truncate block">
                                 {leader?.name || t.noMatchYet}
                               </span>
                             </div>
                           </div>
                           <div className="text-right shrink-0">
-                            <span className="text-sm font-semibold text-slate-100 font-mono">
+                            <span className="text-sm font-bold text-slate-900 font-mono">
                               {leader?.pointsWon || 0}
                             </span>
-                            <span className="text-[10px] text-slate-400 block uppercase font-medium">
+                            <span className="text-[10px] text-slate-500 block uppercase font-medium">
                               {tourney.config.scoringSystem === 'tennis_games' ? 'Games' : 'Pts'}
                             </span>
                           </div>
@@ -594,9 +602,9 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                       </div>
 
                       {/* Card Footer: Enter Button & Live Score Share */}
-                      <div className="p-3.5 border-t border-slate-800/60 bg-slate-950/60 flex items-center justify-between gap-2">
-                        <div className="text-[11px] text-slate-400 flex items-center gap-1.5 min-w-0">
-                          <Calendar className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                      <div className="p-3.5 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between gap-2">
+                        <div className="text-[11px] text-slate-500 flex items-center gap-1.5 min-w-0">
+                          <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                           <span className="truncate">{t.roundsCreated(tourney.rounds.length)}</span>
                         </div>
 
@@ -605,13 +613,13 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                           <button
                             type="button"
                             onClick={(e) => handleCopyInviteLink(e, tourney.id)}
-                            className="px-2.5 py-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800/80 transition-colors flex items-center gap-1 text-xs font-medium shadow-sm cursor-pointer"
+                            className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 transition-colors flex items-center gap-1 text-xs font-medium shadow-xs cursor-pointer"
                             title={t.copyInviteLink}
                           >
                             {copiedInviteId === tourney.id ? (
                               <>
-                                <Check className="w-3.5 h-3.5 text-emerald-400" />
-                                <span className="text-emerald-400 text-[11px] font-semibold">{t.inviteLinkCopied}</span>
+                                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                <span className="text-emerald-700 text-[11px] font-semibold">{t.inviteLinkCopied}</span>
                               </>
                             ) : (
                               <>
@@ -625,13 +633,13 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                             <button
                               type="button"
                               onClick={(e) => handleCopyShareLink(e, tourney.id)}
-                              className="px-2.5 py-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800/80 transition-colors flex items-center gap-1 text-xs font-medium shadow-sm cursor-pointer"
+                              className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 transition-colors flex items-center gap-1 text-xs font-medium shadow-xs cursor-pointer"
                               title={t.shareLiveScore}
                             >
                               {copiedShareId === tourney.id ? (
                                 <>
-                                  <Check className="w-3.5 h-3.5 text-emerald-400" />
-                                  <span className="text-emerald-400 text-[11px] font-semibold">{t.liveScoreCopied}</span>
+                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                  <span className="text-emerald-700 text-[11px] font-semibold">{t.liveScoreCopied}</span>
                                 </>
                               ) : (
                                 <>
@@ -645,7 +653,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                           <button
                             type="button"
                             onClick={() => onSelectTournament(tourney.id)}
-                            className="px-3.5 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-xs rounded-lg flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
+                            className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs rounded-lg flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
                           >
                             <Play className="w-3 h-3 fill-current" />
                             <span>{t.enterMatchmaker}</span>
@@ -665,44 +673,44 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
       {/* Modal: Create Tournament */}
       {showCreateModal && (
         <div
-          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md overflow-y-auto p-4 sm:p-6 flex items-start justify-center animate-fadeIn"
+          className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs overflow-y-auto p-4 sm:p-6 flex items-start justify-center animate-fadeIn"
           onClick={(e) => {
             if (e.target === e.currentTarget) setShowCreateModal(false);
           }}
         >
           <div
-            className="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl my-6 sm:my-10 space-y-6 relative overflow-hidden"
+            className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl my-6 sm:my-10 space-y-6 relative overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Decorative Neon Blurs */}
-            <div className="absolute -top-24 right-0 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-24 left-0 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+            {/* Subtle Light Mode Accents */}
+            <div className="absolute -top-24 right-0 w-72 h-72 bg-emerald-50/70 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-24 left-0 w-72 h-72 bg-sky-50/70 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4 relative z-10">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4 relative z-10">
               <div className="flex items-center gap-3 pr-4">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center shrink-0">
                   <Trophy className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white tracking-tight">{t.modalCreateTitle}</h3>
-                  <p className="text-xs text-slate-400 mt-0.5">{t.modalCreateSubtitle}</p>
+                  <h3 className="text-xl font-bold text-slate-900 tracking-tight">{t.modalCreateTitle}</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">{t.modalCreateSubtitle}</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
                 aria-label="Close"
-                className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-700 transition-all cursor-pointer shadow-sm active:scale-95 shrink-0"
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 border border-slate-200 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
               >
                 <X className="w-5 h-5 stroke-[2.5]" />
               </button>
             </div>
 
             {/* Form Fields */}
-            <div className="space-y-5">
+            <div className="space-y-5 relative z-10">
               {/* Event Name */}
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1.5 uppercase">
+                <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase">
                   {t.eventNameLabel}
                 </label>
                 <input
@@ -710,15 +718,15 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                   value={name}
                   onChange={e => setName(e.target.value)}
                   placeholder={t.eventNamePlaceholder}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 text-sm focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 placeholder:text-slate-400"
                 />
               </div>
 
               {/* Tournament Visibility (Public Live vs Private) */}
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-2 uppercase flex items-center justify-between">
+                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase flex items-center justify-between">
                   <span>{t.visibilityLabel}</span>
-                  <span className="text-[10px] font-normal text-slate-400 lowercase">
+                  <span className="text-[10px] font-normal text-slate-500 lowercase">
                     {visibility === 'public' ? 'Live score spectator enabled' : 'Roster members only'}
                   </span>
                 </label>
@@ -726,21 +734,21 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                   <button
                     type="button"
                     onClick={() => setVisibility('public')}
-                    className={`p-3.5 rounded-2xl border text-left transition-all ${
+                    className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
                       visibility === 'public'
-                        ? 'bg-emerald-500/15 border-emerald-500 ring-1 ring-emerald-500/50 shadow-lg shadow-emerald-500/10'
-                        : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                        ? 'bg-emerald-50/80 border-emerald-500 ring-1 ring-emerald-500/50 shadow-xs'
+                        : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      <div className={`p-1.5 rounded-lg ${visibility === 'public' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-800 text-slate-400'}`}>
+                      <div className={`p-1.5 rounded-lg ${visibility === 'public' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
                         <Globe className="w-4 h-4" />
                       </div>
-                      <span className={`font-semibold text-xs ${visibility === 'public' ? 'text-emerald-400' : 'text-slate-300'}`}>
+                      <span className={`font-semibold text-xs ${visibility === 'public' ? 'text-emerald-800' : 'text-slate-700'}`}>
                         {t.visibilityPublic}
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                    <p className="text-[11px] text-slate-500 leading-relaxed">
                       {t.visibilityPublicDesc}
                     </p>
                   </button>
@@ -748,21 +756,21 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                   <button
                     type="button"
                     onClick={() => setVisibility('private')}
-                    className={`p-3.5 rounded-2xl border text-left transition-all ${
+                    className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
                       visibility === 'private'
-                        ? 'bg-amber-500/15 border-amber-500/80 ring-1 ring-amber-500/40 shadow-sm'
-                        : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                        ? 'bg-amber-50/80 border-amber-500 ring-1 ring-amber-500/50 shadow-xs'
+                        : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      <div className={`p-1.5 rounded-lg ${visibility === 'private' ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-800 text-slate-400'}`}>
+                      <div className={`p-1.5 rounded-lg ${visibility === 'private' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'}`}>
                         <Lock className="w-4 h-4" />
                       </div>
-                      <span className={`font-semibold text-xs ${visibility === 'private' ? 'text-amber-400' : 'text-slate-300'}`}>
+                      <span className={`font-semibold text-xs ${visibility === 'private' ? 'text-amber-800' : 'text-slate-700'}`}>
                         {t.visibilityPrivate}
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                    <p className="text-[11px] text-slate-500 leading-relaxed">
                       {t.visibilityPrivateDesc}
                     </p>
                   </button>
@@ -772,10 +780,10 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
               {/* Courts Selection */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold text-slate-300 uppercase">
+                  <label className="text-xs font-bold text-slate-700 uppercase">
                     {t.courtSelectionLabel}
                   </label>
-                  <span className="text-xs text-emerald-400 font-bold">
+                  <span className="text-xs text-emerald-700 font-bold">
                     {courtCount} {lang === 'en' ? 'Courts' : 'Lapangan'} ({requiredCapacity} {lang === 'en' ? 'Players' : 'Pemain'})
                   </span>
                 </div>
@@ -785,10 +793,10 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                       key={num}
                       type="button"
                       onClick={() => setCourtCount(num)}
-                      className={`py-2 rounded-xl border text-xs font-bold transition-all ${
+                      className={`py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
                         courtCount === num
-                          ? 'bg-emerald-500 text-slate-950 border-emerald-400'
-                          : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                          : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
                       }`}
                     >
                       {num}
@@ -799,162 +807,162 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
 
               {/* Pairing Mode */}
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-2 uppercase">
+                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase">
                   {t.pairingModeLabel}
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
                     onClick={() => setPairingMode('individual')}
-                    className={`p-3 rounded-xl border text-left transition-all ${
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                       pairingMode === 'individual'
-                        ? 'bg-emerald-500/15 border-emerald-500 text-white'
-                        : 'bg-slate-950 border-slate-800 text-slate-400'
+                        ? 'bg-emerald-50/80 border-emerald-500 text-slate-900 ring-1 ring-emerald-500/40 shadow-xs'
+                        : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                     }`}
                   >
-                    <div className="font-bold text-xs text-emerald-400 mb-0.5">{t.individualMode}</div>
-                    <div className="text-[11px] text-slate-300">{t.individualModeDesc}</div>
+                    <div className="font-bold text-xs text-emerald-700 mb-0.5">{t.individualMode}</div>
+                    <div className="text-[11px] text-slate-500">{t.individualModeDesc}</div>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setPairingMode('fixed_pair')}
-                    className={`p-3 rounded-xl border text-left transition-all ${
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                       pairingMode === 'fixed_pair'
-                        ? 'bg-emerald-500/15 border-emerald-500 text-white'
-                        : 'bg-slate-950 border-slate-800 text-slate-400'
+                        ? 'bg-emerald-50/80 border-emerald-500 text-slate-900 ring-1 ring-emerald-500/40 shadow-xs'
+                        : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                     }`}
                   >
-                    <div className="font-bold text-xs text-cyan-400 mb-0.5">{t.fixedPairMode}</div>
-                    <div className="text-[11px] text-slate-300">{t.fixedPairModeDesc}</div>
+                    <div className="font-bold text-xs text-emerald-700 mb-0.5">{t.fixedPairMode}</div>
+                    <div className="text-[11px] text-slate-500">{t.fixedPairModeDesc}</div>
                   </button>
                 </div>
               </div>
 
               {/* Format Selection */}
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-2 uppercase">
+                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase">
                   {t.matchFormatLabel}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   <button
                     type="button"
                     onClick={() => setFormat('americano')}
-                    className={`p-3 rounded-xl border text-center transition-all ${
+                    className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
                       format === 'americano'
-                        ? 'bg-emerald-500/15 border-emerald-500 text-white'
-                        : 'bg-slate-950 border-slate-800 text-slate-400'
+                        ? 'bg-emerald-50 border-emerald-500 text-slate-900 ring-1 ring-emerald-500/40 shadow-xs'
+                        : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                     }`}
                   >
-                    <Shuffle className="w-4 h-4 mx-auto mb-1 text-emerald-400" />
-                    <div className="font-bold text-xs text-white">Americano</div>
+                    <Shuffle className="w-4 h-4 mx-auto mb-1 text-emerald-600" />
+                    <div className="font-bold text-xs text-slate-900">Americano</div>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setFormat('mexicano')}
-                    className={`p-3 rounded-xl border text-center transition-all ${
+                    className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
                       format === 'mexicano'
-                        ? 'bg-cyan-500/15 border-cyan-500 text-white'
-                        : 'bg-slate-950 border-slate-800 text-slate-400'
+                        ? 'bg-cyan-50 border-cyan-500 text-slate-900 ring-1 ring-cyan-500/40 shadow-xs'
+                        : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                     }`}
                   >
-                    <div className="w-4 h-4 mx-auto mb-1 text-cyan-400 font-bold text-xs">⚡</div>
-                    <div className="font-bold text-xs text-white">Mexicano</div>
+                    <div className="w-4 h-4 mx-auto mb-1 text-cyan-600 font-bold text-xs">⚡</div>
+                    <div className="font-bold text-xs text-slate-900">Mexicano</div>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setFormat('king_of_the_court')}
-                    className={`p-3 rounded-xl border text-center transition-all ${
+                    className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
                       format === 'king_of_the_court'
-                        ? 'bg-amber-500/15 border-amber-500 text-white'
-                        : 'bg-slate-950 border-slate-800 text-slate-400'
+                        ? 'bg-amber-50 border-amber-500 text-slate-900 ring-1 ring-amber-500/40 shadow-xs'
+                        : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                     }`}
                   >
-                    <Crown className="w-4 h-4 mx-auto mb-1 text-amber-400" />
-                    <div className="font-bold text-xs text-white">King Court</div>
+                    <Crown className="w-4 h-4 mx-auto mb-1 text-amber-600" />
+                    <div className="font-bold text-xs text-slate-900">King Court</div>
                   </button>
                 </div>
               </div>
 
               {/* Scoring System */}
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-2 uppercase">
+                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase">
                   {t.scoringSystemLabel}
                 </label>
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <button
                     type="button"
                     onClick={() => setScoringSystem('tennis_games')}
-                    className={`p-3 rounded-xl border text-left transition-all ${
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                       scoringSystem === 'tennis_games'
-                        ? 'bg-cyan-500/15 border-cyan-500 text-white'
-                        : 'bg-slate-950 border-slate-800 text-slate-400'
+                        ? 'bg-cyan-50 border-cyan-500 text-slate-900 ring-1 ring-cyan-500/40 shadow-xs'
+                        : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                     }`}
                   >
-                    <div className="font-bold text-xs text-cyan-400 mb-0.5">{t.tennisPointSystem}</div>
-                    <div className="text-[11px] text-slate-300">{t.tennisPointDesc}</div>
+                    <div className="font-bold text-xs text-cyan-700 mb-0.5">{t.tennisPointSystem}</div>
+                    <div className="text-[11px] text-slate-500">{t.tennisPointDesc}</div>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setScoringSystem('fixed_points')}
-                    className={`p-3 rounded-xl border text-left transition-all ${
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                       scoringSystem === 'fixed_points'
-                        ? 'bg-emerald-500/15 border-emerald-500 text-white'
-                        : 'bg-slate-950 border-slate-800 text-slate-400'
+                        ? 'bg-emerald-50 border-emerald-500 text-slate-900 ring-1 ring-emerald-500/40 shadow-xs'
+                        : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                     }`}
                   >
-                    <div className="font-bold text-xs text-emerald-400 mb-0.5">{t.fixedPoints}</div>
-                    <div className="text-[11px] text-slate-300">{t.fixedPointsDesc}</div>
+                    <div className="font-bold text-xs text-emerald-700 mb-0.5">{t.fixedPoints}</div>
+                    <div className="text-[11px] text-slate-500">{t.fixedPointsDesc}</div>
                   </button>
                 </div>
 
                 {scoringSystem === 'tennis_games' && (
-                  <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div
                         onClick={() => setTennisGameMode('total_games')}
                         className={`p-2.5 rounded-lg border cursor-pointer ${
-                          tennisGameMode === 'total_games' ? 'bg-cyan-500/20 border-cyan-500 text-white' : 'border-slate-800 text-slate-400'
+                          tennisGameMode === 'total_games' ? 'bg-white border-cyan-500 ring-1 ring-cyan-500/30 text-slate-900 shadow-xs' : 'bg-white border-slate-200 text-slate-600'
                         }`}
                       >
-                        <span className="font-bold block text-cyan-400">{t.totalGamesOption}</span>
+                        <span className="font-bold block text-cyan-700">{t.totalGamesOption}</span>
                         <input
                           type="number"
                           min={2}
                           max={16}
                           value={totalGamesTarget}
                           onChange={e => setTotalGamesTarget(Number(e.target.value) || 6)}
-                          className="w-16 px-2 py-0.5 bg-slate-900 border border-slate-700 rounded text-center font-bold text-white text-xs mt-1"
+                          className="w-16 px-2 py-0.5 bg-slate-50 border border-slate-200 rounded text-center font-bold text-slate-900 text-xs mt-1"
                         />
                       </div>
 
                       <div
                         onClick={() => setTennisGameMode('race_to')}
                         className={`p-2.5 rounded-lg border cursor-pointer ${
-                          tennisGameMode === 'race_to' ? 'bg-cyan-500/20 border-cyan-500 text-white' : 'border-slate-800 text-slate-400'
+                          tennisGameMode === 'race_to' ? 'bg-white border-cyan-500 ring-1 ring-cyan-500/30 text-slate-900 shadow-xs' : 'bg-white border-slate-200 text-slate-600'
                         }`}
                       >
-                        <span className="font-bold block text-cyan-400">{t.raceToOption}</span>
+                        <span className="font-bold block text-cyan-700">{t.raceToOption}</span>
                         <input
                           type="number"
                           min={2}
                           max={12}
                           value={raceToGamesTarget}
                           onChange={e => setRaceToGamesTarget(Number(e.target.value) || 6)}
-                          className="w-16 px-2 py-0.5 bg-slate-900 border border-slate-700 rounded text-center font-bold text-white text-xs mt-1"
+                          className="w-16 px-2 py-0.5 bg-slate-50 border border-slate-200 rounded text-center font-bold text-slate-900 text-xs mt-1"
                         />
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between p-2 bg-slate-900 rounded-lg border border-slate-800 text-xs mt-2">
-                      <span className="text-white font-medium">{t.puntoDeOro}</span>
+                    <div className="flex items-center justify-between p-2 bg-white rounded-lg border border-slate-200 text-xs mt-2">
+                      <span className="text-slate-800 font-medium">{t.puntoDeOro}</span>
                       <button
                         type="button"
                         onClick={() => setGoldenPoint(!goldenPoint)}
-                        className={`w-9 h-4.5 rounded-full p-0.5 transition-colors ${goldenPoint ? 'bg-emerald-500' : 'bg-slate-700'}`}
+                        className={`w-9 h-4.5 rounded-full p-0.5 transition-colors cursor-pointer ${goldenPoint ? 'bg-emerald-600' : 'bg-slate-300'}`}
                       >
                         <div className={`w-3.5 h-3.5 rounded-full bg-white transition-transform ${goldenPoint ? 'translate-x-4' : 'translate-x-0'}`} />
                       </button>
@@ -963,18 +971,18 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                 )}
 
                 {scoringSystem === 'fixed_points' && (
-                  <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between">
-                    <span className="text-xs text-slate-300">Target Points:</span>
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                    <span className="text-xs text-slate-600 font-medium">Target Points:</span>
                     <div className="flex gap-1.5">
                       {([16, 21, 24, 32] as FixedPointsOption[]).map(pts => (
                         <button
                           key={pts}
                           type="button"
                           onClick={() => setTargetPoints(pts)}
-                          className={`px-3 py-1 rounded-lg text-xs font-bold border ${
+                          className={`px-3 py-1 rounded-lg text-xs font-bold border cursor-pointer ${
                             targetPoints === pts
-                              ? 'bg-emerald-500 text-slate-950 border-emerald-400'
-                              : 'bg-slate-900 border-slate-800 text-slate-300'
+                              ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                              : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
                           }`}
                         >
                           {pts}
@@ -988,7 +996,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
               {/* Roster & Capacity */}
               <div>
                 <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
-                  <label className="text-xs font-bold text-slate-300 uppercase">
+                  <label className="text-xs font-bold text-slate-700 uppercase">
                     {t.rosterLabel(playerList.length)}
                   </label>
                   <div className="flex items-center gap-1.5 flex-wrap">
@@ -996,9 +1004,9 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                     <button
                       type="button"
                       onClick={() => setShowReclubModal(true)}
-                      className="px-2.5 py-1 bg-gradient-to-r from-red-500/20 to-rose-600/20 hover:from-red-500/30 hover:to-rose-600/30 text-rose-300 border border-rose-500/40 text-[11px] font-bold rounded-lg flex items-center gap-1.5 shadow-sm transition-all active:scale-95"
+                      className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-[11px] font-bold rounded-lg flex items-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer"
                     >
-                      <span className="w-3.5 h-3.5 rounded-full bg-rose-500 text-white flex items-center justify-center font-black text-[9px]">R</span>
+                      <span className="w-3.5 h-3.5 rounded-full bg-rose-600 text-white flex items-center justify-center font-black text-[9px]">R</span>
                       <span>{lang === 'id' ? 'Import Reclub' : 'Import Reclub'}</span>
                     </button>
 
@@ -1007,7 +1015,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                       <button
                         type="button"
                         onClick={() => setPlayerList([])}
-                        className="px-2 py-1 bg-slate-800/80 hover:bg-red-500/20 text-slate-400 hover:text-red-300 text-[11px] rounded-lg font-medium transition-colors border border-slate-700/60"
+                        className="px-2 py-1 bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-700 text-[11px] rounded-lg font-medium transition-colors border border-slate-200 cursor-pointer"
                       >
                         {lang === 'id' ? 'Kosongkan' : 'Clear'}
                       </button>
@@ -1017,14 +1025,14 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                     <button
                       type="button"
                       onClick={() => setPlayerList(DEFAULT_PRESET_NAMES.slice(0, requiredCapacity))}
-                      className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] rounded-lg font-medium border border-slate-700"
+                      className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] rounded-lg font-medium border border-slate-200 cursor-pointer"
                     >
                       Preset {requiredCapacity}
                     </button>
                     <button
                       type="button"
                       onClick={() => setPlayerList(DEFAULT_PRESET_NAMES.slice(0, requiredCapacity + 2))}
-                      className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] rounded-lg font-medium border border-slate-700"
+                      className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] rounded-lg font-medium border border-slate-200 cursor-pointer"
                     >
                       +{2} Sit-out
                     </button>
@@ -1032,9 +1040,9 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                 </div>
 
                 {sitOutCount > 0 && (
-                  <div className="text-[11px] text-blue-300 bg-blue-950/40 border border-blue-800/40 p-2 rounded-lg mb-2 flex items-center justify-between">
+                  <div className="text-[11px] text-blue-700 bg-blue-50 border border-blue-200 p-2 rounded-lg mb-2 flex items-center justify-between">
                     <span>⚠️ {t.sitOutAlert(sitOutCount)}</span>
-                    <span className="font-bold text-blue-400">Fair Rest</span>
+                    <span className="font-bold text-blue-700">Fair Rest</span>
                   </div>
                 )}
 
@@ -1045,21 +1053,21 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                     onChange={e => setNewPlayerName(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddPlayer(); } }}
                     placeholder={t.playerInputPlaceholder}
-                    className="flex-1 px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500"
+                    className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600"
                   />
                   <button
                     type="button"
                     onClick={handleAddPlayer}
-                    className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl transition-all"
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs rounded-xl transition-all cursor-pointer"
                   >
                     {t.addBtn}
                   </button>
                 </div>
 
                 {playerList.length === 0 ? (
-                  <div className="p-4 rounded-2xl border border-dashed border-slate-800 bg-slate-950/40 text-center space-y-2.5">
-                    <Users className="w-6 h-6 text-slate-600 mx-auto" />
-                    <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                  <div className="p-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50/70 text-center space-y-2.5">
+                    <Users className="w-6 h-6 text-slate-400 mx-auto" />
+                    <p className="text-xs text-slate-500 max-w-sm mx-auto">
                       {lang === 'id'
                         ? 'Roster pemain masih kosong. Masukkan nama manual di atas, import dari Reclub, atau gunakan preset.'
                         : 'Player roster is currently empty. Add player names above, import from Reclub, or use a preset.'}
@@ -1068,7 +1076,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                       <button
                         type="button"
                         onClick={() => setShowReclubModal(true)}
-                        className="px-3.5 py-1.5 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md shadow-rose-500/20 active:scale-95 transition-all"
+                        className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-medium flex items-center gap-1.5 shadow-xs active:scale-95 transition-all cursor-pointer"
                       >
                         <span className="w-3.5 h-3.5 rounded-full bg-white text-rose-600 flex items-center justify-center font-black text-[9px]">R</span>
                         <span>{lang === 'id' ? 'Import Peserta dari Reclub' : 'Import from Reclub'}</span>
@@ -1076,24 +1084,24 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                       <button
                         type="button"
                         onClick={() => setPlayerList(DEFAULT_PRESET_NAMES.slice(0, requiredCapacity))}
-                        className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-all"
+                        className="px-3.5 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-medium transition-all cursor-pointer"
                       >
                         {lang === 'id' ? `Isi Cepat (${requiredCapacity} Pemain)` : `Fill Preset (${requiredCapacity})`}
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-2.5 bg-slate-950 rounded-2xl border border-slate-800">
+                  <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-2.5 bg-slate-50 rounded-2xl border border-slate-200">
                     {playerList.map((p, i) => (
                       <span
                         key={i}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 shadow-xs"
                       >
                         <span>{p}</span>
                         <button
                           type="button"
                           onClick={() => handleRemovePlayer(i)}
-                          className="text-slate-500 hover:text-red-400 p-0.5"
+                          className="text-slate-400 hover:text-red-600 p-0.5 cursor-pointer"
                         >
                           ✕
                         </button>
@@ -1105,11 +1113,11 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
             </div>
 
             {/* Modal Actions */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 relative z-10">
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-medium transition-colors cursor-pointer"
               >
                 {t.cancelBtn}
               </button>
@@ -1117,7 +1125,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                 type="button"
                 onClick={handleCreateSubmit}
                 disabled={!isCapacitySufficient}
-                className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 text-slate-950 font-semibold text-xs rounded-xl flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white font-medium text-xs rounded-xl flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
               >
                 <span>{t.saveAndOpenBtn}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
