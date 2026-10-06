@@ -1108,24 +1108,51 @@ export function App() {
           <div className="relative group">
             {/* Hover Trigger Pill */}
             <div
-              className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-all shadow-2xs cursor-pointer select-none whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors duration-300 shadow-2xs cursor-pointer select-none whitespace-nowrap ${
                 isPrivateTournament
                   ? 'bg-amber-50 hover:bg-amber-100/70 border-amber-200 text-amber-800'
                   : 'bg-emerald-50 hover:bg-emerald-100/70 border-emerald-200 text-emerald-800'
               }`}
             >
-              {isPrivateTournament ? (
-                <>
-                  <Lock className="w-3.5 h-3.5 text-amber-600" />
-                  <span>{lang === 'id' ? 'Privat' : 'Private'}</span>
-                </>
-              ) : (
-                <>
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <Globe className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>{lang === 'id' ? 'Publik Live' : 'Public Live'}</span>
-                </>
-              )}
+              <div className="w-3.5 h-3.5 relative flex items-center justify-center shrink-0">
+                <Lock
+                  className={`w-3.5 h-3.5 text-amber-600 transition-all duration-300 ease-out transform ${
+                    isPrivateTournament
+                      ? 'opacity-100 scale-100 rotate-0'
+                      : 'opacity-0 scale-50 rotate-45 pointer-events-none absolute'
+                  }`}
+                />
+                <Globe
+                  className={`w-3.5 h-3.5 text-emerald-600 transition-all duration-300 ease-out transform ${
+                    !isPrivateTournament
+                      ? 'opacity-100 scale-100 rotate-0'
+                      : 'opacity-0 scale-50 -rotate-45 pointer-events-none absolute'
+                  }`}
+                />
+              </div>
+
+              <div className="relative h-4 w-[62px] flex items-center justify-start overflow-hidden">
+                <span
+                  className={`absolute left-0 text-xs font-semibold transition-all duration-300 ease-out leading-none ${
+                    isPrivateTournament
+                      ? 'opacity-100 translate-y-0 text-amber-800'
+                      : 'opacity-0 -translate-y-2 pointer-events-none text-emerald-800'
+                  }`}
+                >
+                  {lang === 'id' ? 'Privat' : 'Private'}
+                </span>
+                <span
+                  className={`absolute left-0 text-xs font-semibold transition-all duration-300 ease-out leading-none flex items-center gap-1 ${
+                    !isPrivateTournament
+                      ? 'opacity-100 translate-y-0 text-emerald-800'
+                      : 'opacity-0 translate-y-2 pointer-events-none text-amber-800'
+                  }`}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                  <span>{lang === 'id' ? 'Publik' : 'Public'}</span>
+                </span>
+              </div>
+
               <span className="text-slate-400 font-normal hidden sm:inline">•</span>
               <span className="text-slate-700 font-medium capitalize hidden sm:inline">
                 {config.format.replace(/_/g, ' ')}

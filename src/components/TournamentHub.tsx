@@ -35,6 +35,7 @@ import {
   UserPlus
 } from 'lucide-react';
 import { ReclubImportModal } from './ReclubImportModal';
+import { TournamentVisibilityBadge } from './TournamentVisibilityBadge';
 
 interface TournamentHubProps {
   tournaments: TournamentRecord[];
@@ -523,32 +524,13 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                               </button>
                             )}
 
-                            {/* 2. Minimalist Visibility Indicator */}
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onUpdateTournamentVisibility?.(tourney.id, isPrivate ? 'public' : 'private');
-                              }}
-                              className={`text-[11px] font-medium px-2 py-0.5 rounded-md border flex items-center gap-1 transition-colors cursor-pointer ${
-                                isPrivate
-                                  ? 'bg-amber-50 hover:bg-amber-100/70 border-amber-200 text-amber-700'
-                                  : 'bg-emerald-50 hover:bg-emerald-100/70 border-emerald-200 text-emerald-700'
-                              }`}
-                              title={lang === 'id' ? 'Klik untuk ubah status Publik / Privat' : 'Click to toggle Public / Private'}
-                            >
-                              {isPrivate ? (
-                                <>
-                                  <Lock className="w-3 h-3 text-amber-600" />
-                                  <span>Private</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Globe className="w-3 h-3 text-emerald-600" />
-                                  <span>Public</span>
-                                </>
-                              )}
-                            </button>
+                            {/* 2. Interactive Visibility Toggle Badge with Smooth Transitions */}
+                            <TournamentVisibilityBadge
+                              tournamentId={tourney.id}
+                              visibility={getTournamentVisibility(tourney)}
+                              onToggle={onUpdateTournamentVisibility}
+                              lang={lang}
+                            />
                           </div>
                         </div>
                       </div>
