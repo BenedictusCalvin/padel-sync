@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
-import type { LeaderboardEntry, TournamentConfig } from '../types/tournament';
+import React, { useState, useMemo } from 'react';
+import type { LeaderboardEntry, TournamentConfig, Round } from '../types/tournament';
 import { translations, type Language } from '../utils/translations';
+import { PdlUpLeaderboard } from './PdlUpLeaderboard';
+import { mapLeaderboardToPlayerRows } from '../utils/scheduler';
 import {
   Trophy,
   Search,
@@ -10,7 +12,9 @@ import {
   Coffee,
   ArrowUpDown,
   Users,
-  EyeOff
+  EyeOff,
+  Maximize2,
+  X
 } from 'lucide-react';
 
 interface LeaderboardPanelProps {
@@ -20,6 +24,7 @@ interface LeaderboardPanelProps {
   currentRound: number;
   isSpectatorMode?: boolean;
   isCompleted?: boolean;
+  rounds?: Round[];
 }
 
 export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
@@ -28,14 +33,21 @@ export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
   lang,
   currentRound,
   isSpectatorMode = false,
-  isCompleted = false
+  isCompleted = false,
+  rounds = []
 }) => {
   const t = translations[lang];
   const [searchQuery, setSearchQuery] = useState('');
   const [copied, setCopied] = useState(false);
+  const [showFullModal, setShowFullModal] = useState(false);
 
   const isHiddenForSpectators = Boolean(
     config.advancedSettings?.hidePublicLeaderboard && isSpectatorMode && !isCompleted
+  );
+
+  const playerRows = useMemo(
+    () => mapLeaderboardToPlayerRows(leaderboard, rounds),
+    [leaderboard, rounds]
   );
 
   const filtered = leaderboard.filter(e =>
@@ -84,24 +96,36 @@ export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={handleShare}
-          className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 flex items-center gap-1.5 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
-          title={t.copyStandingsBtn}
-        >
-          {copied ? (
-            <>
-              <Check className="w-3.5 h-3.5 text-emerald-600" />
-              <span className="text-emerald-700 text-[11px] font-bold">{t.copiedText}</span>
-            </>
-          ) : (
-            <>
-              <Share2 className="w-3.5 h-3.5 text-slate-500" />
-              <span className="text-[11px] hidden sm:inline">{t.copyStandingsBtn}</span>
-            </>
-          )}
-        </button>
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setShowFullModal(true)}
+            className="px-2 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 flex items-center gap-1.5 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+            title="Buka Tabel Detail Klasemen"
+          >
+            <Maximize2 className="w-3.5 h-3.5 text-slate-600" />
+            <span className="text-[11px] hidden sm:inline">{lang === 'id' ? 'Detail' : 'Table'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleShare}
+            className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 flex items-center gap-1.5 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+            title={t.copyStandingsBtn}
+          >
+            {copied ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="text-emerald-700 text-[11px] font-bold">{t.copiedText}</span>
+              </>
+            ) : (
+              <>
+                <Share2 className="w-3.5 h-3.5 text-slate-500" />
+                <span className="text-[11px] hidden sm:inline">{t.copyStandingsBtn}</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Search Input */}
@@ -158,6 +182,7 @@ export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
             const isTop3 = displayRank === 3;
             const displayPoints = entry.effectivePoints ?? entry.pointsWon;
             const hasComp = Boolean(entry.compensationPoints && entry.compensationPoints > 0);
+            const pRow = playerRows.find(r => r.id === entry.id);
 
             return (
               <div
@@ -172,7 +197,7 @@ export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
                     : 'bg-slate-50/60 border-slate-200/60 hover:bg-slate-50 text-slate-800'
                 }`}
               >
-                {/* Left: Rank + Name */}
+                {/* Left: Rank + Name + Dots */}
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div
                     className={`w-6 h-6 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 ${
@@ -205,13 +230,32 @@ export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
                         </span>
                       )}
                     </div>
+
+                    {/* Micro Form Dots */}
+                    {pRow && pRow.matchHistoryDots.length > 0 && (
+                      <div className="flex items-center gap-1 mt-1">
+                        {pRow.matchHistoryDots.map((res, i) => (
+                          <span
+                            key={i}
+                            title={`Match ${i + 1}: ${res.toUpperCase()}`}
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              res === 'win'
+                                ? 'bg-emerald-500'
+                                : res === 'loss'
+                                ? 'bg-rose-500'
+                                : 'bg-slate-300'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Right: Points & Differential */}
                 <div className="flex items-center gap-3 text-right shrink-0">
                   <div>
-                    <div className="text-base font-bold font-mono text-slate-900 tabular-nums flex items-center justify-end gap-1">
+                    <div className="text-base sm:text-lg font-black font-mono text-sky-600 tabular-nums flex items-center justify-end gap-1">
                       <span>{displayPoints}</span>
                       {hasComp && (
                         <span
@@ -260,6 +304,30 @@ export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
           {config.advancedSettings?.sortByWinsBeforePoints ? 'W > PTS > DIFF' : t.rankingCriteria}
         </span>
       </div>
+
+      {/* Modal Detailed PDL UP Leaderboard Table */}
+      {showFullModal && (
+        <div className="fixed inset-0 z-50 bg-black/45 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+          <div className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto">
+            <button
+              type="button"
+              onClick={() => setShowFullModal(false)}
+              className="absolute top-4 right-4 z-10 p-2 bg-white/90 hover:bg-slate-100 rounded-xl text-slate-500 hover:text-slate-900 border border-slate-200 transition-all cursor-pointer shadow-xs"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <PdlUpLeaderboard
+              rows={playerRows}
+              tournamentTitle={config.name}
+              currentRound={currentRound}
+              scoringUnit={config.scoringSystem === 'tennis_games' ? 'games' : 'points'}
+              isSpectatorMode={isSpectatorMode}
+              isCompleted={isCompleted}
+              hidePublicLeaderboard={config.advancedSettings?.hidePublicLeaderboard}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

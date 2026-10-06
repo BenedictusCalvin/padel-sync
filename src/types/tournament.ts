@@ -138,6 +138,21 @@ export interface LeaderboardEntry {
   rank?: number;
 }
 
+export interface LeaderboardPlayerRow {
+  rank: number;
+  id: string;
+  name: string;
+  avatar?: string;
+  gamesPlayed: number; // Kolom G
+  wins: number;        // W
+  losses: number;      // L
+  ties: number;        // T
+  pointDiff: number;   // Kolom DIFF
+  matchHistoryDots: ('win' | 'loss' | 'tie')[]; // Array titik riwayat game (maks. 12-16 titik kecil)
+  compensationPoints: number; // Kolom +M
+  totalPoints: number; // Kolom P (angka utama berwarna biru)
+}
+
 export interface TournamentState {
   config: TournamentConfig;
   players: Player[];

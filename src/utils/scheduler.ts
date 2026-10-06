@@ -20,7 +20,8 @@ import type {
   LeaderboardEntry,
   FixedPairTeam,
   TournamentAdvancedSettings,
-  TiebreakingRule
+  TiebreakingRule,
+  LeaderboardPlayerRow
 } from '../types/tournament';
 
 // ============================================================================
@@ -1094,6 +1095,61 @@ export function sortLeaderboardWithAdvancedRules(
   });
 
   return entries;
+}
+
+/**
+ * Maps standard LeaderboardEntry + Round history into PDL UP LeaderboardPlayerRow
+ * with G, W, L, T, DIFF, matchHistoryDots, +M compensation, and totalPoints.
+ */
+export function mapLeaderboardToPlayerRows(
+  leaderboard: LeaderboardEntry[],
+  rounds: Round[] = []
+): LeaderboardPlayerRow[] {
+  return leaderboard.map((entry, idx) => {
+    const historyDots: ('win' | 'loss' | 'tie')[] = [];
+
+    // Chronologically traverse completed rounds to extract match results for this player/pair
+    rounds.forEach(round => {
+      round.matches.forEach(m => {
+        if (!m.completed) return;
+        const inTeamA =
+          m.teamA.player1Id === entry.id ||
+          m.teamA.player2Id === entry.id ||
+          m.teamA.id === entry.id;
+        const inTeamB =
+          m.teamB.player1Id === entry.id ||
+          m.teamB.player2Id === entry.id ||
+          m.teamB.id === entry.id;
+
+        const scoreA = m.teamA.score ?? 0;
+        const scoreB = m.teamB.score ?? 0;
+
+        if (inTeamA) {
+          if (scoreA > scoreB) historyDots.push('win');
+          else if (scoreB > scoreA) historyDots.push('loss');
+          else historyDots.push('tie');
+        } else if (inTeamB) {
+          if (scoreB > scoreA) historyDots.push('win');
+          else if (scoreA > scoreB) historyDots.push('loss');
+          else historyDots.push('tie');
+        }
+      });
+    });
+
+    return {
+      rank: entry.rank ?? idx + 1,
+      id: entry.id,
+      name: entry.name,
+      gamesPlayed: entry.matchesPlayed,
+      wins: entry.matchesWon,
+      losses: entry.matchesLost,
+      ties: entry.matchesTied,
+      pointDiff: entry.pointDiff,
+      matchHistoryDots: historyDots.slice(-16), // Maksimal 12-16 titik riwayat
+      compensationPoints: entry.compensationPoints || 0,
+      totalPoints: entry.effectivePoints ?? entry.pointsWon
+    };
+  });
 }
 
 export function recalculateLeaderboard(

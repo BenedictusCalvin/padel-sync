@@ -1692,6 +1692,7 @@ export function App() {
               currentRound={currentRound?.roundNumber || 1}
               isSpectatorMode={isSpectatorMode}
               isCompleted={activeRecord?.status === 'completed'}
+              rounds={activeRecord?.rounds || []}
             />
           </div>
         </div>
