@@ -55,3 +55,45 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+/* Tactile Button Press Transitions & Micro-Animations */
+button,
+[role="button"],
+input[type="button"],
+input[type="submit"] {
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.15s ease,
+              filter 0.15s ease,
+              background-color 0.15s ease,
+              border-color 0.15s ease,
+              color 0.15s ease,
+              opacity 0.15s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  will-change: transform;
+}
+
+button:active:not(:disabled),
+[role="button"]:active:not(:disabled):not([aria-disabled="true"]),
+input[type="button"]:active:not(:disabled),
+input[type="submit"]:active:not(:disabled) {
+  transform: scale(0.96) translateY(1px) !important;
+  filter: brightness(0.96);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04) !important;
+  transition-duration: 0.05s;
+}
+
+button.no-press-anim:active,
+[role="button"].no-press-anim:active {
+  transform: none !important;
+  filter: none !important;
+  box-shadow: none !important;
+}
+
+button:disabled,
+button[disabled],
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+

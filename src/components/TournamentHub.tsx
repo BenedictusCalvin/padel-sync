@@ -383,7 +383,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                 <button
                   type="button"
                   onClick={() => setVisibilityFilter('all')}
-                  className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                  className={`px-3 py-1 rounded-lg transition-all duration-150 active:scale-95 cursor-pointer ${
                     visibilityFilter === 'all'
                       ? 'bg-white text-slate-900 font-semibold shadow-xs'
                       : 'text-slate-600 hover:text-slate-900 font-medium'
@@ -394,7 +394,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                 <button
                   type="button"
                   onClick={() => setVisibilityFilter('public')}
-                  className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-3 py-1 rounded-lg transition-all duration-150 active:scale-95 flex items-center gap-1.5 cursor-pointer ${
                     visibilityFilter === 'public'
                       ? 'bg-white text-emerald-700 font-semibold shadow-xs'
                       : 'text-slate-600 hover:text-emerald-700 font-medium'
@@ -407,7 +407,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                   <button
                     type="button"
                     onClick={() => setVisibilityFilter('private')}
-                    className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                    className={`px-3 py-1 rounded-lg transition-all duration-150 active:scale-95 flex items-center gap-1.5 cursor-pointer ${
                       visibilityFilter === 'private'
                         ? 'bg-white text-amber-700 font-semibold shadow-xs'
                         : 'text-slate-600 hover:text-amber-700 font-medium'
