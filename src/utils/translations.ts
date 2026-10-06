@@ -45,8 +45,8 @@ export const translations = {
 
     // Hub
     hubTitle: 'Padel Tournament Manager',
-    hubSubtitle: 'Create and run multiple Padel tournaments and sessions simultaneously. Click any tournament card or title to open the live matchmaker.',
-    createNewTournament: 'CREATE NEW TOURNAMENT',
+    hubSubtitle: 'Manage concurrent padel tournaments, court rotations, and real-time live scores.',
+    createNewTournament: 'New Tournament',
     totalTournaments: 'Total Tournaments',
     activeCourts: 'Active Courts',
     registeredPlayers: 'Registered Players',
@@ -220,8 +220,8 @@ export const translations = {
 
     // Hub
     hubTitle: 'Padel Tournament Manager',
-    hubSubtitle: 'Kelola beberapa sesi dan kompetisi padel secara mandiri dalam satu platform. Klik judul atau kartu turnamen untuk membuka live matchmaker.',
-    createNewTournament: 'BUAT TURNAMEN BARU',
+    hubSubtitle: 'Kelola turnamen padel, rotasi lapangan, dan skor langsung secara bersamaan.',
+    createNewTournament: 'Buat Turnamen Baru',
     totalTournaments: 'Total Turnamen',
     activeCourts: 'Lapangan Aktif',
     registeredPlayers: 'Pemain Terdaftar',

@@ -854,15 +854,15 @@ export function App() {
         <header className="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40">
           <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-emerald-500/20 text-lg">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-emerald-400 font-bold text-base">
                 ⚡
               </div>
               <div>
-                <div className="font-black text-lg text-white tracking-wider flex items-center gap-1.5 leading-none">
+                <div className="font-bold text-base text-white tracking-wider flex items-center gap-1 leading-none">
                   <span>PDL</span>
-                  <span className="text-emerald-400">UP</span>
+                  <span className="text-emerald-400 font-extrabold">UP</span>
                 </div>
-                <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">
+                <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mt-0.5">
                   {t.multiHubSubtitle}
                 </div>
               </div>
@@ -873,13 +873,13 @@ export function App() {
               {renderUserAuthButton()}
 
               {/* Language Switcher Pill */}
-              <div className="flex items-center bg-slate-900 border border-slate-800 rounded-xl p-0.5 text-xs font-bold shadow-inner">
+              <div className="flex items-center bg-slate-900 border border-slate-800 rounded-xl p-0.5 text-xs font-medium shadow-inner">
                 <button
                   type="button"
                   onClick={() => setLang('en')}
                   className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
                     lang === 'en'
-                      ? 'bg-emerald-500 text-slate-950 font-black shadow-sm shadow-emerald-500/20'
+                      ? 'bg-emerald-500 text-slate-950 font-semibold shadow-sm'
                       : 'text-slate-400 hover:text-white'
                   }`}
                   title="Switch to English"
@@ -892,7 +892,7 @@ export function App() {
                   onClick={() => setLang('id')}
                   className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
                     lang === 'id'
-                      ? 'bg-emerald-500 text-slate-950 font-black shadow-sm shadow-emerald-500/20'
+                      ? 'bg-emerald-500 text-slate-950 font-semibold shadow-sm'
                       : 'text-slate-400 hover:text-white'
                   }`}
                   title="Ganti ke Bahasa Indonesia"
@@ -901,7 +901,7 @@ export function App() {
                 </button>
               </div>
 
-              <span className="hidden sm:inline px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
+              <span className="hidden sm:inline px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-slate-300 text-xs font-medium">
                 {t.activeTournamentsCount(visibleTournamentsCount)}
               </span>
             </div>

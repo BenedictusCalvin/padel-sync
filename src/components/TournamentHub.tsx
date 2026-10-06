@@ -23,7 +23,6 @@ import {
   Play,
   Trash2,
   Calendar,
-  Sparkles,
   ArrowRight,
   Crown,
   Shuffle,
@@ -289,20 +288,13 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 animate-fadeIn">
       {/* Top Banner / Hero */}
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-2xl relative overflow-hidden">
-        <div className="absolute -right-16 -top-16 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -left-16 -bottom-16 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>{t.multiHubSubtitle}</span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+      <div className="p-6 sm:p-8 rounded-2xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-md relative overflow-hidden">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
+          <div className="space-y-1.5">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-100 tracking-tight">
               {t.hubTitle}
             </h1>
-            <p className="text-slate-400 text-sm max-w-xl">
+            <p className="text-slate-400 text-sm max-w-xl leading-relaxed">
               {t.hubSubtitle}
             </p>
           </div>
@@ -310,46 +302,46 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
           <button
             type="button"
             onClick={handleOpenCreateModal}
-            className="px-6 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-sm rounded-2xl shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-2 transition-all transform hover:scale-105 active:scale-95 shrink-0"
+            className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-sm rounded-xl shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-95 shrink-0"
           >
-            <Plus className="w-5 h-5 stroke-[2.5]" />
+            <Plus className="w-4 h-4 stroke-[2.5]" />
             <span>{t.createNewTournament}</span>
           </button>
         </div>
 
         {/* Global Statistics Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-8 pt-6 border-t border-slate-800/80">
-          <div className="p-3.5 bg-slate-900/60 rounded-xl border border-slate-800">
-            <div className="text-xs text-slate-400 flex items-center gap-1.5 mb-1 font-semibold">
-              <Trophy className="w-3.5 h-3.5 text-amber-400" />
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-5 border-t border-slate-800/60">
+          <div className="p-3 bg-slate-950/40 rounded-xl border border-slate-800/60">
+            <div className="text-xs text-slate-400 flex items-center gap-1.5 mb-1 font-medium">
+              <Trophy className="w-3.5 h-3.5 text-amber-400/90" />
               <span>{t.totalTournaments}</span>
             </div>
-            <div className="text-2xl font-black text-white">{visibleTournaments.length}</div>
+            <div className="text-xl font-semibold text-slate-100">{visibleTournaments.length}</div>
           </div>
 
-          <div className="p-3.5 bg-slate-900/60 rounded-xl border border-slate-800">
-            <div className="text-xs text-slate-400 flex items-center gap-1.5 mb-1 font-semibold">
-              <Layers className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="p-3 bg-slate-950/40 rounded-xl border border-slate-800/60">
+            <div className="text-xs text-slate-400 flex items-center gap-1.5 mb-1 font-medium">
+              <Layers className="w-3.5 h-3.5 text-emerald-400/90" />
               <span>{t.activeCourts}</span>
             </div>
-            <div className="text-2xl font-black text-emerald-400">{totalCourtsInUse}</div>
+            <div className="text-xl font-semibold text-slate-100">{totalCourtsInUse}</div>
           </div>
 
-          <div className="p-3.5 bg-slate-900/60 rounded-xl border border-slate-800">
-            <div className="text-xs text-slate-400 flex items-center gap-1.5 mb-1 font-semibold">
-              <Users className="w-3.5 h-3.5 text-cyan-400" />
+          <div className="p-3 bg-slate-950/40 rounded-xl border border-slate-800/60">
+            <div className="text-xs text-slate-400 flex items-center gap-1.5 mb-1 font-medium">
+              <Users className="w-3.5 h-3.5 text-sky-400/90" />
               <span>{t.registeredPlayers}</span>
             </div>
-            <div className="text-2xl font-black text-cyan-400">{totalActivePlayers}</div>
+            <div className="text-xl font-semibold text-slate-100">{totalActivePlayers}</div>
           </div>
 
-          <div className="p-3.5 bg-slate-900/60 rounded-xl border border-slate-800">
-            <div className="text-xs text-slate-400 flex items-center gap-1.5 mb-1 font-semibold">
-              <Clock className="w-3.5 h-3.5 text-purple-400" />
+          <div className="p-3 bg-slate-950/40 rounded-xl border border-slate-800/60">
+            <div className="text-xs text-slate-400 flex items-center gap-1.5 mb-1 font-medium">
+              <Clock className="w-3.5 h-3.5 text-indigo-400/90" />
               <span>{t.engineStatus}</span>
             </div>
-            <div className="text-sm font-black text-purple-400 mt-1 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="text-sm font-medium text-slate-200 mt-1 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500/80" />
               <span>{t.readyToMatch}</span>
             </div>
           </div>
@@ -372,20 +364,20 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold text-white tracking-tight">{t.activeTournamentsList}</h2>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                <h2 className="text-lg font-bold text-slate-100 tracking-tight">{t.activeTournamentsList}</h2>
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-slate-400 font-medium">
                   {t.sessionsCount(visibleTournaments.length)}
                 </span>
               </div>
 
               {/* Visibility Filter Tabs */}
-              <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 p-1 rounded-xl self-start sm:self-auto">
+              <div className="flex items-center gap-1 bg-slate-950/60 border border-slate-800/80 p-0.5 rounded-xl self-start sm:self-auto text-xs">
                 <button
                   type="button"
                   onClick={() => setVisibilityFilter('all')}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                  className={`px-3 py-1 rounded-lg font-medium transition-all cursor-pointer ${
                     visibilityFilter === 'all'
-                      ? 'bg-slate-800 text-white shadow-sm'
+                      ? 'bg-slate-800 text-slate-100 shadow-sm'
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
@@ -394,26 +386,26 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                 <button
                   type="button"
                   onClick={() => setVisibilityFilter('public')}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                  className={`px-3 py-1 rounded-lg font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
                     visibilityFilter === 'public'
-                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-sm'
-                      : 'text-slate-400 hover:text-emerald-300'
+                      ? 'bg-slate-800 text-emerald-400 shadow-sm'
+                      : 'text-slate-400 hover:text-emerald-400'
                   }`}
                 >
-                  <Globe className="w-3.5 h-3.5" />
+                  <Globe className="w-3.5 h-3.5 text-emerald-500/80" />
                   <span>{t.filterPublic} ({publicCount})</span>
                 </button>
                 {Boolean(user && privateCount > 0) && (
                   <button
                     type="button"
                     onClick={() => setVisibilityFilter('private')}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                    className={`px-3 py-1 rounded-lg font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
                       visibilityFilter === 'private'
-                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 shadow-sm'
+                        ? 'bg-slate-800 text-amber-400 shadow-sm'
                         : 'text-slate-400 hover:text-amber-300'
                     }`}
                   >
-                    <Lock className="w-3.5 h-3.5" />
+                    <Lock className="w-3.5 h-3.5 text-amber-500/80" />
                     <span>{t.filterPrivate} ({privateCount})</span>
                   </button>
                 )}
@@ -421,16 +413,16 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
             </div>
 
             {filteredTournaments.length === 0 ? (
-              <div className="glass-panel p-12 rounded-3xl border border-slate-800 text-center space-y-4">
-                <div className="w-16 h-16 rounded-2xl bg-slate-800/80 text-slate-500 flex items-center justify-center mx-auto text-2xl">
+              <div className="p-10 rounded-2xl bg-slate-900/40 border border-slate-800/80 text-center space-y-4">
+                <div className="w-12 h-12 rounded-xl bg-slate-800/80 text-slate-400 flex items-center justify-center mx-auto text-xl">
                   {visibilityFilter === 'private' ? '🔒' : '🎾'}
                 </div>
-                <h3 className="text-lg font-bold text-white">
+                <h3 className="text-base font-semibold text-slate-100">
                   {visibilityFilter === 'private'
                     ? (lang === 'id' ? 'Belum Ada Turnamen Private' : 'No Private Tournaments')
                     : t.noTournamentsTitle}
                 </h3>
-                <p className="text-slate-400 text-xs max-w-sm mx-auto">
+                <p className="text-slate-400 text-xs max-w-sm mx-auto leading-relaxed">
                   {visibilityFilter === 'private'
                     ? (lang === 'id' ? 'Buat turnamen baru dan pilih status Private untuk peserta terdaftar saja.' : 'Create a new tournament and choose Private for registered players only.')
                     : t.noTournamentsDesc}
@@ -438,37 +430,48 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                 <button
                   type="button"
                   onClick={handleOpenCreateModal}
-                  className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl inline-flex items-center gap-2"
+                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-xs rounded-xl inline-flex items-center gap-2 shadow-sm transition-all cursor-pointer"
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-3.5 h-3.5" />
                   <span>{t.createFirstTourney}</span>
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredTournaments.map(tourney => {
                   const leader = tourney.leaderboard[0];
                   const isFixedPair = tourney.config.pairingMode === 'fixed_pair';
                   const isPrivate = getTournamentVisibility(tourney) === 'private';
                   const pendingRequests = (tourney.joinRequests || []).filter(r => r.status === 'pending');
 
+                  // Combined Clean Format & Target Label
+                  const formatName = tourney.config.format === 'king_of_the_court'
+                    ? 'King of Court'
+                    : tourney.config.format.charAt(0).toUpperCase() + tourney.config.format.slice(1);
+                  const targetLabel = tourney.config.scoringSystem === 'fixed_points'
+                    ? `${tourney.config.targetPoints} Pts`
+                    : tourney.config.tennisGameMode === 'total_games'
+                    ? `${tourney.config.totalGamesTarget} Games`
+                    : `Race ${tourney.config.raceToGamesTarget}G`;
+                  const formatSummary = `${formatName} • ${targetLabel}${isFixedPair ? ' • Pair' : ''}`;
+
                   return (
                     <div
                       key={tourney.id}
-                      className="glass-panel rounded-2xl border border-slate-800 hover:border-emerald-500/60 transition-all duration-300 shadow-xl flex flex-col justify-between group overflow-hidden relative"
+                      className="rounded-2xl border border-slate-800/80 hover:border-slate-700 bg-slate-900/40 hover:bg-slate-900/60 transition-all duration-200 shadow-lg flex flex-col justify-between group overflow-hidden"
                     >
                       {/* Card Header (CLICKABLE TO OPEN MATCHMAKER) */}
                       <div
                         onClick={() => onSelectTournament(tourney.id)}
-                        className="p-5 border-b border-slate-800/80 bg-slate-950/40 cursor-pointer hover:bg-slate-900/60 transition-colors"
+                        className="p-4 border-b border-slate-800/60 bg-slate-950/30 cursor-pointer transition-colors"
                       >
-                        <div className="flex items-start justify-between gap-3 mb-2">
+                        <div className="flex items-start justify-between gap-3 mb-2.5">
                           <h3
                             onClick={(e) => {
                               e.stopPropagation();
                               onSelectTournament(tourney.id);
                             }}
-                            className="font-extrabold text-white text-lg group-hover:text-emerald-400 hover:text-emerald-300 cursor-pointer transition-colors line-clamp-1"
+                            className="font-semibold text-slate-100 text-base group-hover:text-emerald-400 transition-colors line-clamp-1 cursor-pointer"
                             title={tourney.name}
                           >
                             {tourney.name}
@@ -481,117 +484,109 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                                 onDeleteTournament(tourney.id);
                               }
                             }}
-                            className="text-slate-500 hover:text-red-400 p-1 rounded-lg opacity-60 group-hover:opacity-100 transition-opacity"
+                            className="text-slate-500 hover:text-red-400 p-1 rounded-lg opacity-40 group-hover:opacity-100 transition-opacity cursor-pointer shrink-0"
                             title="Delete Tournament"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
 
-                        {/* Format & Visibility Badges */}
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          {/* Visibility Badge (Quick Toggle) */}
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onUpdateTournamentVisibility?.(tourney.id, isPrivate ? 'public' : 'private');
-                            }}
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full border flex items-center gap-1 transition-all cursor-pointer ${
-                              isPrivate
-                                ? 'bg-amber-500/15 hover:bg-amber-500/30 border-amber-500/30 text-amber-300'
-                                : 'bg-emerald-500/15 hover:bg-emerald-500/30 border-emerald-500/30 text-emerald-300'
-                            }`}
-                            title={lang === 'id' ? 'Klik untuk ubah status Publik / Privat' : 'Click to toggle Public / Private'}
-                          >
-                            {isPrivate ? (
-                              <>
-                                <Lock className="w-3 h-3" />
-                                <span>{t.visibilityPrivate}</span>
-                              </>
-                            ) : (
-                              <>
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                <Globe className="w-3 h-3" />
-                                <span>{t.visibilityPublic}</span>
-                              </>
+                        {/* Format & Visibility (Max 2 concise items) */}
+                        <div className="flex items-center justify-between gap-2">
+                          {/* 1. Combined Neutral Format Tag */}
+                          <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-md bg-slate-800/80 border border-slate-700/50 text-slate-300 truncate">
+                            {formatSummary}
+                          </span>
+
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            {/* Pending Join Requests Indicator (discreet) */}
+                            {pendingRequests.length > 0 && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onOpenRequestsModal?.(tourney.id);
+                                }}
+                                className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 flex items-center gap-1 transition-colors cursor-pointer"
+                                title={lang === 'id' ? 'Tinjau permintaan gabung' : 'Review join requests'}
+                              >
+                                <span>🔔</span>
+                                <span>{pendingRequests.length}</span>
+                              </button>
                             )}
-                          </button>
 
-                          <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 uppercase">
-                            {tourney.config.format.replace(/_/g, ' ')}
-                          </span>
-                          <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300">
-                            {isFixedPair ? t.fixedPairMode : t.individualMode}
-                          </span>
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
-                            {tourney.config.scoringSystem === 'fixed_points'
-                              ? `Fixed ${tourney.config.targetPoints} Pts`
-                              : tourney.config.tennisGameMode === 'total_games'
-                              ? `Total ${tourney.config.totalGamesTarget} Games`
-                              : `Race to ${tourney.config.raceToGamesTarget} Games`}
-                          </span>
-
-                          {/* Pending Join Requests Notification Pill */}
-                          {pendingRequests.length > 0 && (
+                            {/* 2. Minimalist Visibility Indicator */}
                             <button
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                onOpenRequestsModal?.(tourney.id);
+                                onUpdateTournamentVisibility?.(tourney.id, isPrivate ? 'public' : 'private');
                               }}
-                              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 flex items-center gap-1 animate-pulse transition-all cursor-pointer shadow-sm"
-                              title={lang === 'id' ? 'Klik untuk tinjau permintaan gabung' : 'Click to review join requests'}
+                              className={`text-[11px] font-medium px-2 py-0.5 rounded-md border flex items-center gap-1 transition-colors cursor-pointer ${
+                                isPrivate
+                                  ? 'bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/20 text-amber-400/90'
+                                  : 'bg-emerald-500/10 hover:bg-emerald-500/20 border-emerald-500/20 text-emerald-400/90'
+                              }`}
+                              title={lang === 'id' ? 'Klik untuk ubah status Publik / Privat' : 'Click to toggle Public / Private'}
                             >
-                              <span>🔔</span>
-                              <span>{t.pendingRequestsBadge(pendingRequests.length)}</span>
+                              {isPrivate ? (
+                                <>
+                                  <Lock className="w-3 h-3 text-amber-400" />
+                                  <span>Private</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Globe className="w-3 h-3 text-emerald-400" />
+                                  <span>Public</span>
+                                </>
+                              )}
                             </button>
-                          )}
+                          </div>
                         </div>
                       </div>
 
                       {/* Card Body Metrics (Also clickable to open) */}
                       <div
                         onClick={() => onSelectTournament(tourney.id)}
-                        className="p-5 space-y-3.5 cursor-pointer"
+                        className="p-4 space-y-3 cursor-pointer"
                       >
                         <div className="grid grid-cols-2 gap-2 text-xs">
-                          <div className="p-2.5 bg-slate-900/60 rounded-xl border border-slate-800">
-                            <span className="text-slate-400 block text-[10px] uppercase font-semibold">
+                          <div className="p-2.5 bg-slate-950/40 rounded-xl border border-slate-800/60">
+                            <span className="text-slate-400 block text-[10px] uppercase font-medium">
                               {t.activeCourts}
                             </span>
-                            <span className="font-bold text-white text-sm">
+                            <span className="font-semibold text-slate-200 text-sm">
                               {t.courtCountLabel(tourney.config.courtCount)}
                             </span>
                           </div>
-                          <div className="p-2.5 bg-slate-900/60 rounded-xl border border-slate-800">
-                            <span className="text-slate-400 block text-[10px] uppercase font-semibold">
+                          <div className="p-2.5 bg-slate-950/40 rounded-xl border border-slate-800/60">
+                            <span className="text-slate-400 block text-[10px] uppercase font-medium">
                               {t.registeredPlayers}
                             </span>
-                            <span className="font-bold text-white text-sm">
+                            <span className="font-semibold text-slate-200 text-sm">
                               {t.participantsCount(tourney.players.length, isFixedPair)}
                             </span>
                           </div>
                         </div>
 
                         {/* Leader Preview */}
-                        <div className="p-3 bg-gradient-to-r from-amber-950/20 to-slate-900/60 rounded-xl border border-amber-500/30 flex items-center justify-between">
+                        <div className="p-2.5 bg-slate-950/40 rounded-xl border border-slate-800/60 flex items-center justify-between">
                           <div className="flex items-center gap-2 min-w-0">
-                            <Crown className="w-4 h-4 text-amber-400 shrink-0" />
+                            <Crown className="w-4 h-4 text-amber-400/80 shrink-0" />
                             <div className="min-w-0">
-                              <span className="text-[10px] text-amber-400/90 font-bold block uppercase tracking-wider">
+                              <span className="text-[10px] text-slate-400 font-medium block uppercase tracking-wider">
                                 {t.temporaryRank1}
                               </span>
-                              <span className="font-bold text-white text-xs truncate block">
+                              <span className="font-medium text-slate-200 text-xs truncate block">
                                 {leader?.name || t.noMatchYet}
                               </span>
                             </div>
                           </div>
                           <div className="text-right shrink-0">
-                            <span className="text-sm font-black text-amber-400 font-mono">
+                            <span className="text-sm font-semibold text-slate-100 font-mono">
                               {leader?.pointsWon || 0}
                             </span>
-                            <span className="text-[10px] text-slate-400 block uppercase font-semibold">
+                            <span className="text-[10px] text-slate-400 block uppercase font-medium">
                               {tourney.config.scoringSystem === 'tennis_games' ? 'Games' : 'Pts'}
                             </span>
                           </div>
@@ -599,24 +594,24 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                       </div>
 
                       {/* Card Footer: Enter Button & Live Score Share */}
-                      <div className="p-4 border-t border-slate-800/80 bg-slate-950/80 flex items-center justify-between gap-2">
+                      <div className="p-3.5 border-t border-slate-800/60 bg-slate-950/60 flex items-center justify-between gap-2">
                         <div className="text-[11px] text-slate-400 flex items-center gap-1.5 min-w-0">
                           <Calendar className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                           <span className="truncate">{t.roundsCreated(tourney.rounds.length)}</span>
                         </div>
 
-                        <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex items-center gap-1.5 shrink-0">
                           {/* Invite Players Link Button */}
                           <button
                             type="button"
                             onClick={(e) => handleCopyInviteLink(e, tourney.id)}
-                            className="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-emerald-400 border border-slate-800 hover:border-emerald-500/40 transition-all flex items-center gap-1.5 text-xs font-semibold shadow-sm"
+                            className="px-2.5 py-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800/80 transition-colors flex items-center gap-1 text-xs font-medium shadow-sm cursor-pointer"
                             title={t.copyInviteLink}
                           >
                             {copiedInviteId === tourney.id ? (
                               <>
                                 <Check className="w-3.5 h-3.5 text-emerald-400" />
-                                <span className="text-emerald-400 text-[11px] font-bold">{t.inviteLinkCopied}</span>
+                                <span className="text-emerald-400 text-[11px] font-semibold">{t.inviteLinkCopied}</span>
                               </>
                             ) : (
                               <>
@@ -630,13 +625,13 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                             <button
                               type="button"
                               onClick={(e) => handleCopyShareLink(e, tourney.id)}
-                              className="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-emerald-400 border border-slate-800 hover:border-emerald-500/40 transition-all flex items-center gap-1.5 text-xs font-semibold shadow-sm"
+                              className="px-2.5 py-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800/80 transition-colors flex items-center gap-1 text-xs font-medium shadow-sm cursor-pointer"
                               title={t.shareLiveScore}
                             >
                               {copiedShareId === tourney.id ? (
                                 <>
                                   <Check className="w-3.5 h-3.5 text-emerald-400" />
-                                  <span className="text-emerald-400 text-[11px] font-bold">{t.liveScoreCopied}</span>
+                                  <span className="text-emerald-400 text-[11px] font-semibold">{t.liveScoreCopied}</span>
                                 </>
                               ) : (
                                 <>
@@ -650,11 +645,11 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                           <button
                             type="button"
                             onClick={() => onSelectTournament(tourney.id)}
-                            className="px-3.5 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl flex items-center gap-1.5 shadow-md shadow-emerald-500/20 transition-all transform group-hover:scale-105"
+                            className="px-3.5 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-xs rounded-lg flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
                           >
-                            <Play className="w-3.5 h-3.5 fill-current" />
+                            <Play className="w-3 h-3 fill-current" />
                             <span>{t.enterMatchmaker}</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
+                            <ArrowRight className="w-3 h-3" />
                           </button>
                         </div>
                       </div>
@@ -741,7 +736,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                       <div className={`p-1.5 rounded-lg ${visibility === 'public' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-800 text-slate-400'}`}>
                         <Globe className="w-4 h-4" />
                       </div>
-                      <span className={`font-black text-xs ${visibility === 'public' ? 'text-emerald-400' : 'text-slate-300'}`}>
+                      <span className={`font-semibold text-xs ${visibility === 'public' ? 'text-emerald-400' : 'text-slate-300'}`}>
                         {t.visibilityPublic}
                       </span>
                     </div>
@@ -755,7 +750,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                     onClick={() => setVisibility('private')}
                     className={`p-3.5 rounded-2xl border text-left transition-all ${
                       visibility === 'private'
-                        ? 'bg-amber-500/15 border-amber-500 ring-1 ring-amber-500/50 shadow-lg shadow-amber-500/10'
+                        ? 'bg-amber-500/15 border-amber-500/80 ring-1 ring-amber-500/40 shadow-sm'
                         : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
                     }`}
                   >
@@ -763,7 +758,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                       <div className={`p-1.5 rounded-lg ${visibility === 'private' ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-800 text-slate-400'}`}>
                         <Lock className="w-4 h-4" />
                       </div>
-                      <span className={`font-black text-xs ${visibility === 'private' ? 'text-amber-400' : 'text-slate-300'}`}>
+                      <span className={`font-semibold text-xs ${visibility === 'private' ? 'text-amber-400' : 'text-slate-300'}`}>
                         {t.visibilityPrivate}
                       </span>
                     </div>
@@ -1122,7 +1117,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                 type="button"
                 onClick={handleCreateSubmit}
                 disabled={!isCapacitySufficient}
-                className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 text-slate-950 font-black text-xs rounded-xl flex items-center gap-1.5 shadow-lg shadow-emerald-500/20"
+                className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 text-slate-950 font-semibold text-xs rounded-xl flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
               >
                 <span>{t.saveAndOpenBtn}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
