@@ -448,7 +448,7 @@ export function App() {
           ...m,
           teamA: { ...m.teamA, score: scoreA },
           teamB: { ...m.teamB, score: scoreB },
-          completed: true,
+          completed: m.completed,
           winner: scoreA > scoreB ? 'teamA' : scoreB > scoreA ? 'teamB' : 'tie'
         } as const;
       });
@@ -529,6 +529,13 @@ export function App() {
       i === activeTabRound ? finalizedCurrentRound : r
     );
 
+    // Calculate fresh leaderboard with current round finalized
+    const freshLeaderboard = recalculateLeaderboard(
+      activeRecord.players,
+      updatedRoundsSoFar,
+      activeRecord.config.pairingMode
+    );
+
     const nextRoundNumber = activeRecord.rounds.length + 1;
 
     const { round: nextRound, updatedPlayers } = generateNextRound(
@@ -537,7 +544,7 @@ export function App() {
       activeRecord.courts,
       nextRoundNumber,
       finalizedCurrentRound,
-      activeRecord.leaderboard
+      freshLeaderboard
     );
 
     const newRounds = [...updatedRoundsSoFar, nextRound];

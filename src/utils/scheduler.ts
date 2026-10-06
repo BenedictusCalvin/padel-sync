@@ -3,11 +3,11 @@
  * Algorithmic Scheduling & Tournament Operations
  * 
  * Supports:
- * - Americano: Individual (rotate partner & opponent) OR Fixed Pair (round-robin teams)
- * - Mexicano: Individual (dynamic Swiss tiers) OR Fixed Pair (ladder pairing by team standing)
- * - King of the Court: Individual (partner split) OR Fixed Pair (pair moves together)
- * - Scoring: Fixed Points (16, 21, 24, 32) OR Tennis Games (Total of X Games, Race to X Games)
- * - Fair Bench / Sit-out rotation balancer
+ * - Americano: Individual (optimal non-repeating partners) OR Fixed Pair (Berger round-robin)
+ * - Mexicano: Dynamic Swiss tiers (Rank 1+4 vs Rank 2+3, anti-duplicate partner)
+ * - King of the Court: Court ladder with mandatory partner splits & bench challenger rotation
+ * - Scoring: Fixed Points (16, 21, 24, 32) OR Tennis Games (Total / Race To)
+ * - Fair Bench / Sit-out rotation balancer (max delta <= 1 match, anti-consecutive sit-outs)
  */
 
 import type {
@@ -38,7 +38,7 @@ export function extractFixedPairs(players: Player[]): FixedPairTeam[] {
         name: pairName,
         player1: p1,
         player2: p2,
-        sitOutCount: Math.min(p1.sitOutCount, p2.sitOutCount),
+        sitOutCount: Math.min(p1.sitOutCount ?? 0, p2.sitOutCount ?? 0),
         lastSitOutRound: Math.max(p1.lastSitOutRound ?? -1, p2.lastSitOutRound ?? -1),
         currentCourtLevel: p1.currentCourtLevel ?? Math.floor(pairs.length / 2) + 1
       });
@@ -48,12 +48,20 @@ export function extractFixedPairs(players: Player[]): FixedPairTeam[] {
 }
 
 // ============================================================================
-// 2. Fair Sit-out / Bench Rotation Balancer
+// 2. Fair Sit-out / Bench Rotation Balancer (Universal)
 // ============================================================================
+
+/**
+ * Ensures sit-outs are distributed with mathematical fairness across the tournament:
+ * 1. Players who rested in the immediate previous round MUST play (no back-to-back sit-outs).
+ * 2. Players who have played the MOST matches have highest priority to sit out (keeps match delta <= 1).
+ * 3. Players with fewest sit-outs sit out first; if tied, player who sat out furthest in the past sits out first.
+ */
 export function balanceBenchPlayers(
   players: Player[],
   capacityNeeded: number,
-  _roundNumber?: number
+  roundNumber: number = 1,
+  leaderboard: LeaderboardEntry[] = []
 ): { activePlayers: Player[]; benchPlayers: Player[] } {
   if (players.length <= capacityNeeded) {
     return {
@@ -63,20 +71,63 @@ export function balanceBenchPlayers(
   }
 
   const benchCount = players.length - capacityNeeded;
+  const prevRound = roundNumber - 1;
 
-  const sortedForBench = [...players].sort((a, b) => {
-    if (a.sitOutCount !== b.sitOutCount) {
-      return a.sitOutCount - b.sitOutCount;
+  // Compute matches played for each player
+  const matchCountMap = new Map<string, number>();
+  if (leaderboard.length > 0) {
+    leaderboard.forEach(entry => {
+      matchCountMap.set(entry.id, entry.matchesPlayed);
+    });
+  }
+
+  players.forEach(p => {
+    if (!matchCountMap.has(p.id)) {
+      // Estimated matches played prior to this round
+      const estimated = Math.max(0, prevRound - (p.sitOutCount || 0));
+      matchCountMap.set(p.id, estimated);
+    }
+  });
+
+  // Rule 1: Prevent back-to-back sit-outs
+  const didRestLastRound = (p: Player) => (p.lastSitOutRound ?? -1) === prevRound;
+
+  const canRest = players.filter(p => !didRestLastRound(p));
+  const mustPlayIfPossible = players.filter(p => didRestLastRound(p));
+
+  // Sort candidates to rest:
+  // - Higher matches played -> rests first
+  // - Lower sitOutCount -> rests first
+  // - Smaller lastSitOutRound (-1, 1, 2...) -> sat out furthest in the past rests first
+  const benchPriorityComparator = (a: Player, b: Player) => {
+    const playedA = matchCountMap.get(a.id) ?? 0;
+    const playedB = matchCountMap.get(b.id) ?? 0;
+    if (playedA !== playedB) {
+      return playedB - playedA; // Most matches played rests first!
+    }
+    if ((a.sitOutCount ?? 0) !== (b.sitOutCount ?? 0)) {
+      return (a.sitOutCount ?? 0) - (b.sitOutCount ?? 0); // Fewest sit-outs rests first!
     }
     const lastA = a.lastSitOutRound ?? -1;
     const lastB = b.lastSitOutRound ?? -1;
     if (lastA !== lastB) {
-      return lastA - lastB;
+      return lastA - lastB; // Sat out furthest in the past rests first!
     }
     return a.id.localeCompare(b.id);
-  });
+  };
 
-  const benchPlayers = sortedForBench.slice(0, benchCount);
+  canRest.sort(benchPriorityComparator);
+  mustPlayIfPossible.sort(benchPriorityComparator);
+
+  let benchPlayers: Player[] = [];
+  if (canRest.length >= benchCount) {
+    benchPlayers = canRest.slice(0, benchCount);
+  } else {
+    // Edge case where benchCount exceeds canRest pool size
+    const remainder = benchCount - canRest.length;
+    benchPlayers = [...canRest, ...mustPlayIfPossible.slice(0, remainder)];
+  }
+
   const benchIds = new Set(benchPlayers.map(p => p.id));
   const activePlayers = players.filter(p => !benchIds.has(p.id));
 
@@ -86,7 +137,8 @@ export function balanceBenchPlayers(
 export function balanceBenchPairs(
   pairs: FixedPairTeam[],
   courtsCount: number,
-  _roundNumber?: number
+  roundNumber: number = 1,
+  leaderboard: LeaderboardEntry[] = []
 ): { activePairs: FixedPairTeam[]; benchPairs: FixedPairTeam[] } {
   const capacityNeeded = courtsCount * 2; // 2 pairs per court
   if (pairs.length <= capacityNeeded) {
@@ -97,17 +149,55 @@ export function balanceBenchPairs(
   }
 
   const benchCount = pairs.length - capacityNeeded;
-  const sorted = [...pairs].sort((a, b) => {
-    if (a.sitOutCount !== b.sitOutCount) {
-      return a.sitOutCount - b.sitOutCount;
+  const prevRound = roundNumber - 1;
+
+  const matchCountMap = new Map<string, number>();
+  if (leaderboard.length > 0) {
+    leaderboard.forEach(entry => {
+      matchCountMap.set(entry.id, entry.matchesPlayed);
+    });
+  }
+
+  pairs.forEach(p => {
+    if (!matchCountMap.has(p.id)) {
+      const estimated = Math.max(0, prevRound - (p.sitOutCount || 0));
+      matchCountMap.set(p.id, estimated);
+    }
+  });
+
+  const didRestLastRound = (p: FixedPairTeam) => (p.lastSitOutRound ?? -1) === prevRound;
+
+  const canRest = pairs.filter(p => !didRestLastRound(p));
+  const mustPlayIfPossible = pairs.filter(p => didRestLastRound(p));
+
+  const benchPriorityComparator = (a: FixedPairTeam, b: FixedPairTeam) => {
+    const playedA = matchCountMap.get(a.id) ?? 0;
+    const playedB = matchCountMap.get(b.id) ?? 0;
+    if (playedA !== playedB) {
+      return playedB - playedA;
+    }
+    if ((a.sitOutCount ?? 0) !== (b.sitOutCount ?? 0)) {
+      return (a.sitOutCount ?? 0) - (b.sitOutCount ?? 0);
     }
     const lastA = a.lastSitOutRound ?? -1;
     const lastB = b.lastSitOutRound ?? -1;
-    if (lastA !== lastB) return lastA - lastB;
+    if (lastA !== lastB) {
+      return lastA - lastB;
+    }
     return a.id.localeCompare(b.id);
-  });
+  };
 
-  const benchPairs = sorted.slice(0, benchCount);
+  canRest.sort(benchPriorityComparator);
+  mustPlayIfPossible.sort(benchPriorityComparator);
+
+  let benchPairs: FixedPairTeam[] = [];
+  if (canRest.length >= benchCount) {
+    benchPairs = canRest.slice(0, benchCount);
+  } else {
+    const remainder = benchCount - canRest.length;
+    benchPairs = [...canRest, ...mustPlayIfPossible.slice(0, remainder)];
+  }
+
   const benchIds = new Set(benchPairs.map(p => p.id));
   const activePairs = pairs.filter(p => !benchIds.has(p.id));
 
@@ -118,50 +208,103 @@ export function balanceBenchPairs(
 // 3. Americano Schedulers
 // ============================================================================
 
-/** Individual Americano (Minimizes duplicate partner & opponent) */
+/**
+ * Finds the optimal pair partitioning that minimizes repeat partnership history.
+ * Uses branch-and-bound search with greedy heuristic ordering.
+ */
+function findOptimalAmericanoPairs(players: Player[]): [Player, Player][] {
+  if (players.length < 2) return [];
+
+  let bestPairs: [Player, Player][] = [];
+  let minPenalty = Infinity;
+  let iterations = 0;
+  const maxIterations = 25000;
+
+  function backtrack(remaining: Player[], currentPairs: [Player, Player][], currentPenalty: number) {
+    if (remaining.length === 0) {
+      if (currentPenalty < minPenalty) {
+        minPenalty = currentPenalty;
+        bestPairs = [...currentPairs];
+      }
+      return;
+    }
+
+    if (currentPenalty >= minPenalty) return; // Prune suboptimal branch
+    iterations++;
+    if (iterations > maxIterations) return; // Safeguard
+
+    const p1 = remaining[0];
+    const candidates = remaining.slice(1).map(cand => {
+      const pHistory = p1.partnerHistory[cand.id] || 0;
+      const oHistory = p1.opponentHistory[cand.id] || 0;
+      const penalty = pHistory * 10000 + oHistory * 10;
+      return { player: cand, penalty };
+    });
+
+    candidates.sort((a, b) => a.penalty - b.penalty);
+
+    for (const cand of candidates) {
+      const nextRemaining = remaining.slice(1).filter(p => p.id !== cand.player.id);
+      backtrack(nextRemaining, [...currentPairs, [p1, cand.player]], currentPenalty + cand.penalty);
+    }
+  }
+
+  backtrack(players, [], 0);
+  return bestPairs;
+}
+
+/** Individual Americano (Optimal partner rotation with 0 - 0 default scores) */
 export function scheduleIndividualAmericano(
   activePlayers: Player[],
   courts: Court[],
   roundNumber: number,
-  defaultInitialScores: { a: number; b: number }
+  _defaultInitialScores?: { a: number; b: number }
 ): Match[] {
   const courtCount = courts.length;
-  const pool = [...activePlayers];
-  const pairs: [Player, Player][] = [];
+  const numMatches = Math.min(courtCount, Math.floor(activePlayers.length / 4));
+  if (numMatches === 0) return [];
 
-  while (pool.length >= 2) {
-    const p1 = pool.shift()!;
-    let bestPartnerIdx = 0;
-    let minPenalty = Infinity;
+  const playersNeeded = numMatches * 4;
+  const pool = activePlayers.slice(0, playersNeeded);
 
-    for (let i = 0; i < pool.length; i++) {
-      const candidate = pool[i];
-      const partnerTimes = p1.partnerHistory[candidate.id] || 0;
-      const opponentTimes = p1.opponentHistory[candidate.id] || 0;
-      const penalty = partnerTimes * 1000 + opponentTimes * 10;
-      if (penalty < minPenalty) {
-        minPenalty = penalty;
-        bestPartnerIdx = i;
+  // 1. Solve optimal pairs that minimize repeat partners
+  const pairs = findOptimalAmericanoPairs(pool);
+
+  // 2. Pair vs Pair court matching minimizing repeat opponents
+  const matches: Match[] = [];
+  const remainingPairs = [...pairs];
+
+  for (let c = 0; c < numMatches; c++) {
+    const court = courts[c];
+    if (remainingPairs.length < 2) break;
+
+    const pairA = remainingPairs.shift()!;
+
+    let bestOpponentIdx = 0;
+    let minOpponentPenalty = Infinity;
+
+    for (let i = 0; i < remainingPairs.length; i++) {
+      const pairB = remainingPairs[i];
+      const oppPen =
+        (pairA[0].opponentHistory[pairB[0].id] || 0) +
+        (pairA[0].opponentHistory[pairB[1].id] || 0) +
+        (pairA[1].opponentHistory[pairB[0].id] || 0) +
+        (pairA[1].opponentHistory[pairB[1].id] || 0);
+
+      if (oppPen < minOpponentPenalty) {
+        minOpponentPenalty = oppPen;
+        bestOpponentIdx = i;
       }
     }
 
-    const [p2] = pool.splice(bestPartnerIdx, 1);
-    pairs.push([p1, p2]);
-  }
-
-  const matches: Match[] = [];
-  for (let c = 0; c < courtCount; c++) {
-    const pairA = pairs[c * 2];
-    const pairB = pairs[c * 2 + 1];
-    if (!pairA || !pairB) break;
-    const court = courts[c];
+    const [pairB] = remainingPairs.splice(bestOpponentIdx, 1);
 
     const teamA: Team = {
       id: `team-a-${roundNumber}-${court.id}`,
       name: `${pairA[0].name.split(' ')[0]} & ${pairA[1].name.split(' ')[0]}`,
       player1Id: pairA[0].id,
       player2Id: pairA[1].id,
-      score: defaultInitialScores.a
+      score: 0
     };
 
     const teamB: Team = {
@@ -169,7 +312,7 @@ export function scheduleIndividualAmericano(
       name: `${pairB[0].name.split(' ')[0]} & ${pairB[1].name.split(' ')[0]}`,
       player1Id: pairB[0].id,
       player2Id: pairB[1].id,
-      score: defaultInitialScores.b
+      score: 0
     };
 
     matches.push({
@@ -186,16 +329,15 @@ export function scheduleIndividualAmericano(
   return matches;
 }
 
-/** Fixed Pair Americano (Round Robin among pairs with Berger polygon rotation) */
+/** Fixed Pair Americano (Berger polygon round-robin rotation) */
 export function scheduleFixedPairAmericano(
   activePairs: FixedPairTeam[],
   courts: Court[],
   roundNumber: number,
-  defaultInitialScores: { a: number; b: number }
+  _defaultInitialScores?: { a: number; b: number }
 ): Match[] {
   const pool = [...activePairs];
   if (pool.length % 2 !== 0) {
-    // Dummy bye pair if odd
     pool.push({
       id: 'bye-pair',
       name: 'BYE',
@@ -231,14 +373,14 @@ export function scheduleFixedPairAmericano(
           name: pairA.name,
           player1Id: pairA.player1.id,
           player2Id: pairA.player2.id,
-          score: defaultInitialScores.a
+          score: 0
         },
         teamB: {
           id: `team-b-${roundNumber}-${court.id}`,
           name: pairB.name,
           player1Id: pairB.player1.id,
           player2Id: pairB.player2.id,
-          score: defaultInitialScores.b
+          score: 0
         },
         completed: false,
         roundNumber
@@ -253,18 +395,28 @@ export function scheduleFixedPairAmericano(
 // 4. Mexicano Schedulers
 // ============================================================================
 
-/** Individual Mexicano (Tiered grouping by individual leaderboard rank) */
+/**
+ * Individual Mexicano:
+ * 1. Active players are sorted by current leaderboard: Total Points Won > Diff > Matches Won.
+ * 2. Court 1 gets Top 4, Court 2 gets next 4, etc.
+ * 3. Inside each tier:
+ *    - Standard combo: Team A = [Rank 1, Rank 4] vs Team B = [Rank 2, Rank 3].
+ *    - If Rank 1 & 4 were partners in the previous round, fallback to Combo 2 ([Rank 1, Rank 3] vs [Rank 2, Rank 4]).
+ * 4. Default score is 0 - 0 with completed = false.
+ */
 export function scheduleIndividualMexicano(
   activePlayers: Player[],
   courts: Court[],
   roundNumber: number,
-  defaultInitialScores: { a: number; b: number },
-  leaderboard: LeaderboardEntry[]
+  _defaultInitialScores?: { a: number; b: number },
+  leaderboard: LeaderboardEntry[] = [],
+  previousRound?: Round
 ): Match[] {
   if (roundNumber === 1 || leaderboard.length === 0) {
-    return scheduleIndividualAmericano(activePlayers, courts, roundNumber, defaultInitialScores);
+    return scheduleIndividualAmericano(activePlayers, courts, roundNumber);
   }
 
+  // 1. Sort active players by leaderboard rank
   const rankMap = new Map<string, number>();
   leaderboard.forEach((entry, idx) => {
     rankMap.set(entry.id, idx);
@@ -276,51 +428,77 @@ export function scheduleIndividualMexicano(
     return rA - rB;
   });
 
+  const numCourts = Math.min(courts.length, Math.floor(rankedActive.length / 4));
   const matches: Match[] = [];
 
-  for (let c = 0; c < courts.length; c++) {
+  const werePartnersInPrevRound = (id1: string, id2: string): boolean => {
+    if (!previousRound) return false;
+    return previousRound.matches.some(m =>
+      (m.teamA.player1Id === id1 && m.teamA.player2Id === id2) ||
+      (m.teamA.player1Id === id2 && m.teamA.player2Id === id1) ||
+      (m.teamB.player1Id === id1 && m.teamB.player2Id === id2) ||
+      (m.teamB.player1Id === id2 && m.teamB.player2Id === id1)
+    );
+  };
+
+  // 2. Tier assignment per court
+  for (let c = 0; c < numCourts; c++) {
     const court = courts[c];
     const tier = rankedActive.slice(c * 4, c * 4 + 4);
     if (tier.length < 4) break;
 
     const [p1, p2, p3, p4] = tier;
+
+    // Pairing combos in tier
     const combos = [
-      { a: [p1, p4], b: [p2, p3] },
-      { a: [p1, p3], b: [p2, p4] },
-      { a: [p1, p2], b: [p3, p4] }
+      { a: [p1, p4], b: [p2, p3], basePenalty: 0 },
+      { a: [p1, p3], b: [p2, p4], basePenalty: 100 },
+      { a: [p1, p2], b: [p3, p4], basePenalty: 250 }
     ];
 
     let bestCombo = combos[0];
-    let lowestPenalty = Infinity;
+    let minPenalty = Infinity;
 
     for (const combo of combos) {
-      const penaltyA = combo.a[0].partnerHistory[combo.a[1].id] || 0;
-      const penaltyB = combo.b[0].partnerHistory[combo.b[1].id] || 0;
-      const total = penaltyA + penaltyB;
-      if (total < lowestPenalty) {
-        lowestPenalty = total;
+      let penalty = combo.basePenalty;
+
+      // Heavy penalty if paired in immediate previous round
+      if (werePartnersInPrevRound(combo.a[0].id, combo.a[1].id)) penalty += 20000;
+      if (werePartnersInPrevRound(combo.b[0].id, combo.b[1].id)) penalty += 20000;
+
+      // Historical partner frequency penalty
+      const histA = combo.a[0].partnerHistory[combo.a[1].id] || 0;
+      const histB = combo.b[0].partnerHistory[combo.b[1].id] || 0;
+      penalty += (histA + histB) * 500;
+
+      if (penalty < minPenalty) {
+        minPenalty = penalty;
         bestCombo = combo;
       }
     }
+
+    const teamA: Team = {
+      id: `team-a-${roundNumber}-${court.id}`,
+      name: `${bestCombo.a[0].name.split(' ')[0]} & ${bestCombo.a[1].name.split(' ')[0]}`,
+      player1Id: bestCombo.a[0].id,
+      player2Id: bestCombo.a[1].id,
+      score: 0
+    };
+
+    const teamB: Team = {
+      id: `team-b-${roundNumber}-${court.id}`,
+      name: `${bestCombo.b[0].name.split(' ')[0]} & ${bestCombo.b[1].name.split(' ')[0]}`,
+      player1Id: bestCombo.b[0].id,
+      player2Id: bestCombo.b[1].id,
+      score: 0
+    };
 
     matches.push({
       id: `match-r${roundNumber}-c${court.id}`,
       courtId: court.id,
       courtName: court.name,
-      teamA: {
-        id: `team-a-${roundNumber}-${court.id}`,
-        name: `${bestCombo.a[0].name.split(' ')[0]} & ${bestCombo.a[1].name.split(' ')[0]}`,
-        player1Id: bestCombo.a[0].id,
-        player2Id: bestCombo.a[1].id,
-        score: defaultInitialScores.a
-      },
-      teamB: {
-        id: `team-b-${roundNumber}-${court.id}`,
-        name: `${bestCombo.b[0].name.split(' ')[0]} & ${bestCombo.b[1].name.split(' ')[0]}`,
-        player1Id: bestCombo.b[0].id,
-        player2Id: bestCombo.b[1].id,
-        score: defaultInitialScores.b
-      },
+      teamA,
+      teamB,
       completed: false,
       roundNumber
     });
@@ -329,19 +507,18 @@ export function scheduleIndividualMexicano(
   return matches;
 }
 
-/** Fixed Pair Mexicano (Pair Swiss ladder: Rank 1 pair vs Rank 2 pair on Court 1, etc.) */
+/** Fixed Pair Mexicano (Swiss ladder by pair standings) */
 export function scheduleFixedPairMexicano(
   activePairs: FixedPairTeam[],
   courts: Court[],
   roundNumber: number,
-  defaultInitialScores: { a: number; b: number },
-  leaderboard: LeaderboardEntry[]
+  _defaultInitialScores?: { a: number; b: number },
+  leaderboard: LeaderboardEntry[] = []
 ): Match[] {
   if (roundNumber === 1 || leaderboard.length === 0) {
-    return scheduleFixedPairAmericano(activePairs, courts, roundNumber, defaultInitialScores);
+    return scheduleFixedPairAmericano(activePairs, courts, roundNumber);
   }
 
-  // Sort pairs by pair leaderboard rank
   const rankMap = new Map<string, number>();
   leaderboard.forEach((entry, idx) => {
     rankMap.set(entry.id, idx);
@@ -357,115 +534,28 @@ export function scheduleFixedPairMexicano(
   const numCourts = Math.min(courts.length, Math.floor(rankedPairs.length / 2));
 
   for (let c = 0; c < numCourts; c++) {
+    const court = courts[c];
     const pairA = rankedPairs[c * 2];
     const pairB = rankedPairs[c * 2 + 1];
-    const court = courts[c];
+    if (!pairA || !pairB) break;
 
-    if (pairA && pairB) {
-      matches.push({
-        id: `match-r${roundNumber}-c${court.id}`,
-        courtId: court.id,
-        courtName: court.name,
-        teamA: {
-          id: `team-a-${roundNumber}-${court.id}`,
-          name: pairA.name,
-          player1Id: pairA.player1.id,
-          player2Id: pairA.player2.id,
-          score: defaultInitialScores.a
-        },
-        teamB: {
-          id: `team-b-${roundNumber}-${court.id}`,
-          name: pairB.name,
-          player1Id: pairB.player1.id,
-          player2Id: pairB.player2.id,
-          score: defaultInitialScores.b
-        },
-        completed: false,
-        roundNumber
-      });
-    }
-  }
-
-  return matches;
-}
-
-// ============================================================================
-// 5. King of the Court Schedulers
-// ============================================================================
-
-/** Individual King of the Court (Winners promote, losers relegate, partners split) */
-export function scheduleIndividualKing(
-  activePlayers: Player[],
-  courts: Court[],
-  roundNumber: number,
-  defaultInitialScores: { a: number; b: number },
-  previousRound?: Round
-): Match[] {
-  const courtCount = courts.length;
-  if (roundNumber === 1 || !previousRound || !previousRound.completed) {
-    return scheduleIndividualAmericano(activePlayers, courts, roundNumber, defaultInitialScores);
-  }
-
-  const courtBuckets: Map<number, Player[]> = new Map();
-  for (let i = 1; i <= courtCount; i++) {
-    courtBuckets.set(i, []);
-  }
-
-  const playerLookup = new Map<string, Player>(activePlayers.map(p => [p.id, p]));
-
-  previousRound.matches.forEach((match) => {
-    const currentCourtLevel = match.courtId;
-    const teamAWon = match.teamA.score > match.teamB.score;
-    const winnerTeam = teamAWon ? match.teamA : match.teamB;
-    const loserTeam = winnerTeam === match.teamA ? match.teamB : match.teamA;
-
-    const winP1 = playerLookup.get(winnerTeam.player1Id);
-    const winP2 = playerLookup.get(winnerTeam.player2Id);
-    const loseP1 = playerLookup.get(loserTeam.player1Id);
-    const loseP2 = playerLookup.get(loserTeam.player2Id);
-
-    const winDest = Math.max(1, currentCourtLevel - 1);
-    if (winP1) courtBuckets.get(winDest)?.push(winP1);
-    if (winP2) courtBuckets.get(winDest)?.push(winP2);
-
-    const loseDest = Math.min(courtCount, currentCourtLevel + 1);
-    if (loseP1) courtBuckets.get(loseDest)?.push(loseP1);
-    if (loseP2) courtBuckets.get(loseDest)?.push(loseP2);
-  });
-
-  const matches: Match[] = [];
-
-  for (let c = 0; c < courtCount; c++) {
-    const court = courts[c];
-    const candidates = courtBuckets.get(court.id) || [];
-
-    while (candidates.length < 4) {
-      const remaining = activePlayers.find(p => !candidates.includes(p));
-      if (remaining) candidates.push(remaining);
-      else break;
-    }
-
-    const [p1, p2, p3, p4] = candidates.slice(0, 4);
-    if (!p1 || !p2 || !p3 || !p4) continue;
-
-    // Split partners: 1+3 vs 2+4
     matches.push({
       id: `match-r${roundNumber}-c${court.id}`,
       courtId: court.id,
       courtName: court.name,
       teamA: {
         id: `team-a-${roundNumber}-${court.id}`,
-        name: `${p1.name.split(' ')[0]} & ${p3.name.split(' ')[0]}`,
-        player1Id: p1.id,
-        player2Id: p3.id,
-        score: defaultInitialScores.a
+        name: pairA.name,
+        player1Id: pairA.player1.id,
+        player2Id: pairA.player2.id,
+        score: 0
       },
       teamB: {
         id: `team-b-${roundNumber}-${court.id}`,
-        name: `${p2.name.split(' ')[0]} & ${p4.name.split(' ')[0]}`,
-        player1Id: p2.id,
-        player2Id: p4.id,
-        score: defaultInitialScores.b
+        name: pairB.name,
+        player1Id: pairB.player1.id,
+        player2Id: pairB.player2.id,
+        score: 0
       },
       completed: false,
       roundNumber
@@ -475,17 +565,155 @@ export function scheduleIndividualKing(
   return matches;
 }
 
-/** Fixed Pair King of the Court (Winners promote, losers relegate, pairs stay together!) */
+// ============================================================================
+// 5. King of the Court Schedulers
+// ============================================================================
+
+/**
+ * Individual King of the Court:
+ * - Court 1 = King Court (highest level), Court 2, ..., Court C = Bottom Court.
+ * - Winners move up (Court N -> N-1), losers move down (Court N -> N+1).
+ * - Incoming bench players challenge at the bottom court.
+ * - MANDATORY PARTNER SPLIT: Previous partners w1 & w2 MUST be split and face each other as opponents!
+ * - Default scores: 0 - 0 with completed = false.
+ */
+export function scheduleIndividualKing(
+  activePlayers: Player[],
+  courts: Court[],
+  roundNumber: number,
+  _defaultInitialScores?: { a: number; b: number },
+  previousRound?: Round
+): Match[] {
+  const courtCount = courts.length;
+  if (roundNumber === 1 || !previousRound || previousRound.matches.length === 0) {
+    return scheduleIndividualAmericano(activePlayers, courts, roundNumber);
+  }
+
+  const activeLookup = new Map<string, Player>(activePlayers.map(p => [p.id, p]));
+  const courtBuckets: Map<number, Player[]> = new Map();
+  for (let i = 1; i <= courtCount; i++) {
+    courtBuckets.set(i, []);
+  }
+
+  // Record former partnerships so they are strictly split
+  const previousPartnerOf = new Map<string, string>();
+
+  previousRound.matches.forEach(match => {
+    const cLevel = match.courtId;
+    const teamAWon = (match.teamA.score || 0) > (match.teamB.score || 0);
+    const winTeam = teamAWon ? match.teamA : match.teamB;
+    const loseTeam = teamAWon ? match.teamB : match.teamA;
+
+    previousPartnerOf.set(winTeam.player1Id, winTeam.player2Id);
+    previousPartnerOf.set(winTeam.player2Id, winTeam.player1Id);
+    previousPartnerOf.set(loseTeam.player1Id, loseTeam.player2Id);
+    previousPartnerOf.set(loseTeam.player2Id, loseTeam.player1Id);
+
+    // Winners promote: Court N -> Court N - 1 (Court 1 winners stay)
+    const winDest = Math.max(1, cLevel - 1);
+    const w1 = activeLookup.get(winTeam.player1Id);
+    const w2 = activeLookup.get(winTeam.player2Id);
+    if (w1) courtBuckets.get(winDest)?.push(w1);
+    if (w2) courtBuckets.get(winDest)?.push(w2);
+
+    // Losers relegate: Court N -> Court N + 1 (Bottom court losers stay)
+    const loseDest = Math.min(courtCount, cLevel + 1);
+    const l1 = activeLookup.get(loseTeam.player1Id);
+    const l2 = activeLookup.get(loseTeam.player2Id);
+    if (l1) courtBuckets.get(loseDest)?.push(l1);
+    if (l2) courtBuckets.get(loseDest)?.push(l2);
+  });
+
+  // Incoming bench players enter at the bottom court
+  const assignedIds = new Set<string>();
+  courtBuckets.forEach(list => list.forEach(p => assignedIds.add(p.id)));
+
+  activePlayers.forEach(p => {
+    if (!assignedIds.has(p.id)) {
+      courtBuckets.get(courtCount)?.push(p);
+      assignedIds.add(p.id);
+    }
+  });
+
+  // Balance buckets so each court has exactly 4 players
+  for (let c = 1; c <= courtCount; c++) {
+    const bucket = courtBuckets.get(c)!;
+    while (bucket.length > 4 && c < courtCount) {
+      const overflow = bucket.pop()!;
+      courtBuckets.get(c + 1)!.unshift(overflow);
+    }
+  }
+  for (let c = courtCount; c >= 1; c--) {
+    const bucket = courtBuckets.get(c)!;
+    while (bucket.length > 4 && c > 1) {
+      const overflow = bucket.shift()!;
+      courtBuckets.get(c - 1)!.push(overflow);
+    }
+  }
+
+  // Generate matches with MANDATORY PARTNER SPLIT
+  const matches: Match[] = [];
+
+  for (let c = 0; c < courtCount; c++) {
+    const court = courts[c];
+    const pool = courtBuckets.get(court.id) || [];
+    if (pool.length < 4) continue;
+
+    const [p1, p2, p3, p4] = pool.slice(0, 4);
+
+    let teamAPlayers: [Player, Player] = [p1, p3];
+    let teamBPlayers: [Player, Player] = [p2, p4];
+
+    // Ensure former partners face each other
+    const prevOfP1 = previousPartnerOf.get(p1.id);
+    if (prevOfP1 === p3.id) {
+      teamAPlayers = [p1, p2];
+      teamBPlayers = [p3, p4];
+    } else if (prevOfP1 === p4.id) {
+      teamAPlayers = [p1, p2];
+      teamBPlayers = [p4, p3];
+    } else {
+      teamAPlayers = [p1, p3];
+      teamBPlayers = [p2, p4];
+    }
+
+    matches.push({
+      id: `match-r${roundNumber}-c${court.id}`,
+      courtId: court.id,
+      courtName: court.name,
+      teamA: {
+        id: `team-a-${roundNumber}-${court.id}`,
+        name: `${teamAPlayers[0].name.split(' ')[0]} & ${teamAPlayers[1].name.split(' ')[0]}`,
+        player1Id: teamAPlayers[0].id,
+        player2Id: teamAPlayers[1].id,
+        score: 0
+      },
+      teamB: {
+        id: `team-b-${roundNumber}-${court.id}`,
+        name: `${teamBPlayers[0].name.split(' ')[0]} & ${teamBPlayers[1].name.split(' ')[0]}`,
+        player1Id: teamBPlayers[0].id,
+        player2Id: teamBPlayers[1].id,
+        score: 0
+      },
+      completed: false,
+      roundNumber
+    });
+  }
+
+  return matches;
+}
+
+/** Fixed Pair King of the Court (Winners promote, losers relegate, pairs stay together) */
 export function scheduleFixedPairKing(
   activePairs: FixedPairTeam[],
   courts: Court[],
   roundNumber: number,
-  defaultInitialScores: { a: number; b: number },
+  _defaultInitialScores?: { a: number; b: number },
   previousRound?: Round
 ): Match[] {
   const courtCount = courts.length;
-  if (roundNumber === 1 || !previousRound || !previousRound.completed) {
-    return scheduleFixedPairAmericano(activePairs, courts, roundNumber, defaultInitialScores);
+  if (roundNumber === 1 || !previousRound || previousRound.matches.length === 0) {
+    return scheduleFixedPairAmericano(activePairs, courts, roundNumber);
   }
 
   const courtBuckets: Map<number, FixedPairTeam[]> = new Map();
@@ -501,9 +729,9 @@ export function scheduleFixedPairKing(
 
   previousRound.matches.forEach(m => {
     const currentCourtLevel = m.courtId;
-    const teamAWon = m.teamA.score > m.teamB.score;
+    const teamAWon = (m.teamA.score || 0) > (m.teamB.score || 0);
     const winnerTeam = teamAWon ? m.teamA : m.teamB;
-    const loserTeam = winnerTeam === m.teamA ? m.teamB : m.teamA;
+    const loserTeam = teamAWon ? m.teamB : m.teamA;
 
     const winPair = pairLookup.get(`${winnerTeam.player1Id}-${winnerTeam.player2Id}`);
     const losePair = pairLookup.get(`${loserTeam.player1Id}-${loserTeam.player2Id}`);
@@ -515,42 +743,56 @@ export function scheduleFixedPairKing(
     if (losePair) courtBuckets.get(loseDest)?.push(losePair);
   });
 
+  // Assign any incoming bench pairs to bottom court
+  const assignedPairIds = new Set<string>();
+  courtBuckets.forEach(list => list.forEach(p => assignedPairIds.add(p.id)));
+
+  activePairs.forEach(p => {
+    if (!assignedPairIds.has(p.id)) {
+      courtBuckets.get(courtCount)?.push(p);
+      assignedPairIds.add(p.id);
+    }
+  });
+
+  // Balance pairs across courts
+  for (let c = 1; c <= courtCount; c++) {
+    const bucket = courtBuckets.get(c)!;
+    while (bucket.length > 2 && c < courtCount) {
+      const overflow = bucket.pop()!;
+      courtBuckets.get(c + 1)!.unshift(overflow);
+    }
+  }
+
   const matches: Match[] = [];
 
   for (let c = 0; c < courtCount; c++) {
     const court = courts[c];
     const candidates = courtBuckets.get(court.id) || [];
-
-    while (candidates.length < 2) {
-      const rem = activePairs.find(p => !candidates.includes(p));
-      if (rem) candidates.push(rem);
-      else break;
-    }
+    if (candidates.length < 2) continue;
 
     const [pairA, pairB] = candidates.slice(0, 2);
-    if (pairA && pairB) {
-      matches.push({
-        id: `match-r${roundNumber}-c${court.id}`,
-        courtId: court.id,
-        courtName: court.name,
-        teamA: {
-          id: `team-a-${roundNumber}-${court.id}`,
-          name: pairA.name,
-          player1Id: pairA.player1.id,
-          player2Id: pairA.player2.id,
-          score: defaultInitialScores.a
-        },
-        teamB: {
-          id: `team-b-${roundNumber}-${court.id}`,
-          name: pairB.name,
-          player1Id: pairB.player1.id,
-          player2Id: pairB.player2.id,
-          score: defaultInitialScores.b
-        },
-        completed: false,
-        roundNumber
-      });
-    }
+
+    matches.push({
+      id: `match-r${roundNumber}-c${court.id}`,
+      courtId: court.id,
+      courtName: court.name,
+      teamA: {
+        id: `team-a-${roundNumber}-${court.id}`,
+        name: pairA.name,
+        player1Id: pairA.player1.id,
+        player2Id: pairA.player2.id,
+        score: 0
+      },
+      teamB: {
+        id: `team-b-${roundNumber}-${court.id}`,
+        name: pairB.name,
+        player1Id: pairB.player1.id,
+        player2Id: pairB.player2.id,
+        score: 0
+      },
+      completed: false,
+      roundNumber
+    });
   }
 
   return matches;
@@ -568,25 +810,8 @@ export function generateNextRound(
   previousRound?: Round,
   leaderboard: LeaderboardEntry[] = []
 ): { round: Round; updatedPlayers: Player[] } {
-  // Determine default initial scores
-  let initialScoreA = 0;
-  let initialScoreB = 0;
-
-  if (config.scoringSystem === 'fixed_points') {
-    initialScoreA = Math.floor(config.targetPoints / 2) + 1;
-    initialScoreB = config.targetPoints - initialScoreA;
-  } else if (config.scoringSystem === 'tennis_games') {
-    if (config.tennisGameMode === 'total_games') {
-      initialScoreA = Math.floor(config.totalGamesTarget / 2) + 1;
-      initialScoreB = config.totalGamesTarget - initialScoreA;
-    } else {
-      // Race to
-      initialScoreA = 0;
-      initialScoreB = 0;
-    }
-  }
-
-  const defaultScores = { a: initialScoreA, b: initialScoreB };
+  // CRITICAL RULE: Scores ALWAYS initialize to 0 - 0 for every new round
+  const defaultScores = { a: 0, b: 0 };
 
   let matches: Match[] = [];
   let benchPlayerIds: string[] = [];
@@ -594,17 +819,17 @@ export function generateNextRound(
 
   if (config.pairingMode === 'fixed_pair') {
     const fixedPairs = extractFixedPairs(players);
-    const { activePairs, benchPairs } = balanceBenchPairs(fixedPairs, config.courtCount, roundNumber);
+    const { activePairs, benchPairs } = balanceBenchPairs(fixedPairs, config.courtCount, roundNumber, leaderboard);
 
     benchPlayerIds = benchPairs.flatMap(bp => [bp.player1.id, bp.player2.id]);
 
-    // Update sit-out counts for bench pairs
+    // Update sit-out metadata
     updatedPlayers = players.map(p => {
       const isBench = benchPlayerIds.includes(p.id);
       if (isBench) {
         return {
           ...p,
-          sitOutCount: p.sitOutCount + 1,
+          sitOutCount: (p.sitOutCount ?? 0) + 1,
           lastSitOutRound: roundNumber
         };
       }
@@ -621,16 +846,17 @@ export function generateNextRound(
   } else {
     // Individual mode
     const capacityNeeded = config.courtCount * 4;
-    const { activePlayers, benchPlayers } = balanceBenchPlayers(players, capacityNeeded, roundNumber);
+    const { activePlayers, benchPlayers } = balanceBenchPlayers(players, capacityNeeded, roundNumber, leaderboard);
 
     benchPlayerIds = benchPlayers.map(p => p.id);
 
+    // Update sit-out metadata
     updatedPlayers = players.map(p => {
       const isBench = benchPlayerIds.includes(p.id);
       if (isBench) {
         return {
           ...p,
-          sitOutCount: p.sitOutCount + 1,
+          sitOutCount: (p.sitOutCount ?? 0) + 1,
           lastSitOutRound: roundNumber
         };
       }
@@ -640,13 +866,13 @@ export function generateNextRound(
     if (config.format === 'americano') {
       matches = scheduleIndividualAmericano(activePlayers, courts, roundNumber, defaultScores);
     } else if (config.format === 'mexicano') {
-      matches = scheduleIndividualMexicano(activePlayers, courts, roundNumber, defaultScores, leaderboard);
+      matches = scheduleIndividualMexicano(activePlayers, courts, roundNumber, defaultScores, leaderboard, previousRound);
     } else if (config.format === 'king_of_the_court') {
       matches = scheduleIndividualKing(activePlayers, courts, roundNumber, defaultScores, previousRound);
     }
   }
 
-  // Update partnership and opponent histories
+  // Update partnership, opponent, and court histories
   matches.forEach(m => {
     const p1A = updatedPlayers.find(p => p.id === m.teamA.player1Id);
     const p2A = updatedPlayers.find(p => p.id === m.teamA.player2Id);
@@ -668,6 +894,8 @@ export function generateNextRound(
     teamAIds.forEach(idA => {
       const p = updatedPlayers.find(pl => pl.id === idA);
       if (p) {
+        p.courtHistory[m.courtId] = (p.courtHistory[m.courtId] || 0) + 1;
+        p.currentCourtLevel = m.courtId;
         teamBIds.forEach(idB => {
           p.opponentHistory[idB] = (p.opponentHistory[idB] || 0) + 1;
         });
@@ -677,6 +905,8 @@ export function generateNextRound(
     teamBIds.forEach(idB => {
       const p = updatedPlayers.find(pl => pl.id === idB);
       if (p) {
+        p.courtHistory[m.courtId] = (p.courtHistory[m.courtId] || 0) + 1;
+        p.currentCourtLevel = m.courtId;
         teamAIds.forEach(idA => {
           p.opponentHistory[idA] = (p.opponentHistory[idA] || 0) + 1;
         });
@@ -722,7 +952,7 @@ export function recalculateLeaderboard(
         pointsWon: 0,
         pointsConceded: 0,
         pointDiff: 0,
-        sitOutCount: pair.sitOutCount,
+        sitOutCount: pair.sitOutCount ?? 0,
         winRate: 0,
         currentCourtLevel: pair.currentCourtLevel
       });
@@ -730,16 +960,15 @@ export function recalculateLeaderboard(
 
     rounds.forEach(round => {
       round.matches.forEach(match => {
+        // ONLY count matches that have been verified/completed
         if (!match.completed) return;
         const scA = Number(match.teamA.score) || 0;
         const scB = Number(match.teamB.score) || 0;
 
-        // Find pair for teamA
         const pairA = fixedPairs.find(
           p => (p.player1.id === match.teamA.player1Id && p.player2.id === match.teamA.player2Id) ||
                (p.player1.id === match.teamA.player2Id && p.player2.id === match.teamA.player1Id)
         );
-        // Find pair for teamB
         const pairB = fixedPairs.find(
           p => (p.player1.id === match.teamB.player1Id && p.player2.id === match.teamB.player2Id) ||
                (p.player1.id === match.teamB.player2Id && p.player2.id === match.teamB.player1Id)
@@ -786,7 +1015,7 @@ export function recalculateLeaderboard(
         pointsWon: 0,
         pointsConceded: 0,
         pointDiff: 0,
-        sitOutCount: p.sitOutCount,
+        sitOutCount: p.sitOutCount ?? 0,
         winRate: 0,
         currentCourtLevel: p.currentCourtLevel
       });
@@ -794,6 +1023,7 @@ export function recalculateLeaderboard(
 
     rounds.forEach(round => {
       round.matches.forEach(match => {
+        // ONLY count matches that have been verified/completed
         if (!match.completed) return;
         const scA = Number(match.teamA.score) || 0;
         const scB = Number(match.teamB.score) || 0;
@@ -835,7 +1065,7 @@ export function recalculateLeaderboard(
     winRate: e.matchesPlayed > 0 ? Math.round((e.matchesWon / e.matchesPlayed) * 100) : 0
   }));
 
-  // Sort: Points Won > Point Diff (+/-) > Matches Won
+  // Sort criteria: Points Won (desc) > Point Diff (desc) > Matches Won (desc) > Least Matches Played > Name
   entries.sort((a, b) => {
     if (b.pointsWon !== a.pointsWon) return b.pointsWon - a.pointsWon;
     if (b.pointDiff !== a.pointDiff) return b.pointDiff - a.pointDiff;
