@@ -240,7 +240,8 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
     const initialLeaderboard = recalculateLeaderboard(
       updatedPlayers,
       [r1],
-      pairingMode
+      pairingMode,
+      newConfig.advancedSettings
     );
 
     const newRecord: TournamentRecord = {

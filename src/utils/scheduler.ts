@@ -18,7 +18,9 @@ import type {
   Match,
   Team,
   LeaderboardEntry,
-  FixedPairTeam
+  FixedPairTeam,
+  TournamentAdvancedSettings,
+  TiebreakingRule
 } from '../types/tournament';
 
 // ============================================================================
@@ -410,7 +412,8 @@ export function scheduleIndividualMexicano(
   roundNumber: number,
   _defaultInitialScores?: { a: number; b: number },
   leaderboard: LeaderboardEntry[] = [],
-  previousRound?: Round
+  previousRound?: Round,
+  advancedSettings?: TournamentAdvancedSettings
 ): Match[] {
   if (roundNumber === 1 || leaderboard.length === 0) {
     return scheduleIndividualAmericano(activePlayers, courts, roundNumber);
@@ -459,21 +462,26 @@ export function scheduleIndividualMexicano(
     let bestCombo = combos[0];
     let minPenalty = Infinity;
 
-    for (const combo of combos) {
-      let penalty = combo.basePenalty;
+    // Strict Ranking: purely Rank 1 & 4 vs Rank 2 & 3 without partner rotation balancing
+    if (advancedSettings?.pairingAlgorithm === 'strict_ranking') {
+      bestCombo = combos[0];
+    } else {
+      for (const combo of combos) {
+        let penalty = combo.basePenalty;
 
-      // Heavy penalty if paired in immediate previous round
-      if (werePartnersInPrevRound(combo.a[0].id, combo.a[1].id)) penalty += 20000;
-      if (werePartnersInPrevRound(combo.b[0].id, combo.b[1].id)) penalty += 20000;
+        // Heavy penalty if paired in immediate previous round
+        if (werePartnersInPrevRound(combo.a[0].id, combo.a[1].id)) penalty += 20000;
+        if (werePartnersInPrevRound(combo.b[0].id, combo.b[1].id)) penalty += 20000;
 
-      // Historical partner frequency penalty
-      const histA = combo.a[0].partnerHistory[combo.a[1].id] || 0;
-      const histB = combo.b[0].partnerHistory[combo.b[1].id] || 0;
-      penalty += (histA + histB) * 500;
+        // Historical partner frequency penalty
+        const histA = combo.a[0].partnerHistory[combo.a[1].id] || 0;
+        const histB = combo.b[0].partnerHistory[combo.b[1].id] || 0;
+        penalty += (histA + histB) * 500;
 
-      if (penalty < minPenalty) {
-        minPenalty = penalty;
-        bestCombo = combo;
+        if (penalty < minPenalty) {
+          minPenalty = penalty;
+          bestCombo = combo;
+        }
       }
     }
 
@@ -866,7 +874,7 @@ export function generateNextRound(
     if (config.format === 'americano') {
       matches = scheduleIndividualAmericano(activePlayers, courts, roundNumber, defaultScores);
     } else if (config.format === 'mexicano') {
-      matches = scheduleIndividualMexicano(activePlayers, courts, roundNumber, defaultScores, leaderboard, previousRound);
+      matches = scheduleIndividualMexicano(activePlayers, courts, roundNumber, defaultScores, leaderboard, previousRound, config.advancedSettings);
     } else if (config.format === 'king_of_the_court') {
       matches = scheduleIndividualKing(activePlayers, courts, roundNumber, defaultScores, previousRound);
     }
@@ -926,13 +934,173 @@ export function generateNextRound(
 }
 
 // ============================================================================
-// 7. Live Leaderboard Calculation
+// 7. Live Leaderboard Calculation & Advanced Tiebreaker Rules
 // ============================================================================
+
+/**
+ * Calculates direct head-to-head match outcomes between two players across completed matches.
+ */
+export function getHeadToHeadResult(
+  idA: string,
+  idB: string,
+  rounds: Round[]
+): {
+  matchesCount: number;
+  netPoints: number; // positive if A scored more than B in direct matchups
+  netWins: number; // positive if A won more direct matchups against B
+} {
+  let aPoints = 0;
+  let bPoints = 0;
+  let aWins = 0;
+  let bWins = 0;
+  let matchesCount = 0;
+
+  rounds.forEach(rnd => {
+    rnd.matches.forEach(m => {
+      if (!m.completed) return;
+      const teamAIds = [m.teamA.player1Id, m.teamA.player2Id];
+      const teamBIds = [m.teamB.player1Id, m.teamB.player2Id];
+
+      const aInA = teamAIds.includes(idA);
+      const bInA = teamAIds.includes(idB);
+      const aInB = teamBIds.includes(idA);
+      const bInB = teamBIds.includes(idB);
+
+      if (aInA && bInB) {
+        matchesCount++;
+        aPoints += m.teamA.score || 0;
+        bPoints += m.teamB.score || 0;
+        if ((m.teamA.score || 0) > (m.teamB.score || 0)) aWins++;
+        else if ((m.teamB.score || 0) > (m.teamA.score || 0)) bWins++;
+      } else if (aInB && bInA) {
+        matchesCount++;
+        aPoints += m.teamB.score || 0;
+        bPoints += m.teamA.score || 0;
+        if ((m.teamB.score || 0) > (m.teamA.score || 0)) aWins++;
+        else if ((m.teamA.score || 0) > (m.teamB.score || 0)) bWins++;
+      }
+    });
+  });
+
+  return {
+    matchesCount,
+    netPoints: aPoints - bPoints,
+    netWins: aWins - bWins
+  };
+}
+
+/**
+ * Applies advanced rules:
+ * - Compensation Points (+M) for players with fewer matches (if not disabled)
+ * - Sorting by Wins before Points (if enabled)
+ * - Tiebreaker selection: 'diff' | 'head_to_head' | 'allow_tied'
+ */
+export function sortLeaderboardWithAdvancedRules(
+  entries: LeaderboardEntry[],
+  rounds: Round[] = [],
+  settings?: TournamentAdvancedSettings
+): LeaderboardEntry[] {
+  const disableCompensation = settings?.disableCompensationPoints ?? false;
+  const sortByWinsFirst = settings?.sortByWinsBeforePoints ?? false;
+  const tieRule: TiebreakingRule = settings?.tiebreakingRule ?? 'diff';
+
+  // 1. Calculate Compensation Points (+M)
+  const maxMatches = Math.max(0, ...entries.map(e => e.matchesPlayed));
+
+  entries.forEach(entry => {
+    if (!disableCompensation && maxMatches > 0 && entry.matchesPlayed > 0 && entry.matchesPlayed < maxMatches) {
+      const avgPts = entry.pointsWon / entry.matchesPlayed;
+      const missingMatches = maxMatches - entry.matchesPlayed;
+      const comp = Math.round(avgPts * missingMatches);
+      entry.compensationPoints = comp;
+      entry.effectivePoints = entry.pointsWon + comp;
+    } else {
+      entry.compensationPoints = 0;
+      entry.effectivePoints = entry.pointsWon;
+    }
+  });
+
+  // 2. Sorting comparator
+  entries.sort((a, b) => {
+    const ptsA = a.effectivePoints ?? a.pointsWon;
+    const ptsB = b.effectivePoints ?? b.pointsWon;
+
+    if (sortByWinsFirst) {
+      if (b.matchesWon !== a.matchesWon) {
+        return b.matchesWon - a.matchesWon;
+      }
+      if (ptsB !== ptsA) {
+        return ptsB - ptsA;
+      }
+    } else {
+      if (ptsB !== ptsA) {
+        return ptsB - ptsA;
+      }
+      if (tieRule === 'diff') {
+        if (b.pointDiff !== a.pointDiff) {
+          return b.pointDiff - a.pointDiff;
+        }
+      }
+      if (b.matchesWon !== a.matchesWon) {
+        return b.matchesWon - a.matchesWon;
+      }
+    }
+
+    // Secondary Tiebreaker
+    if (tieRule === 'head_to_head' && rounds.length > 0) {
+      const h2h = getHeadToHeadResult(a.id, b.id, rounds);
+      if (h2h.matchesCount > 0) {
+        if (h2h.netWins !== 0) return -h2h.netWins;
+        if (h2h.netPoints !== 0) return -h2h.netPoints;
+      }
+    }
+
+    if (b.pointDiff !== a.pointDiff) {
+      return b.pointDiff - a.pointDiff;
+    }
+
+    if (a.pointsConceded !== b.pointsConceded) {
+      return a.pointsConceded - b.pointsConceded;
+    }
+
+    if (a.matchesPlayed !== b.matchesPlayed) {
+      return a.matchesPlayed - b.matchesPlayed;
+    }
+
+    return a.name.localeCompare(b.name);
+  });
+
+  // 3. Assign Ranks (handling Allow Tied Ranks)
+  entries.forEach((entry, index) => {
+    if (index === 0) {
+      entry.rank = 1;
+      return;
+    }
+
+    const prev = entries[index - 1];
+    const ptsPrev = prev.effectivePoints ?? prev.pointsWon;
+    const ptsCurr = entry.effectivePoints ?? entry.pointsWon;
+
+    const isTied =
+      ptsPrev === ptsCurr &&
+      prev.matchesWon === entry.matchesWon &&
+      (tieRule === 'allow_tied' || prev.pointDiff === entry.pointDiff);
+
+    if (tieRule === 'allow_tied' && isTied) {
+      entry.rank = prev.rank;
+    } else {
+      entry.rank = index + 1;
+    }
+  });
+
+  return entries;
+}
 
 export function recalculateLeaderboard(
   players: Player[],
   rounds: Round[],
-  pairingMode: 'individual' | 'fixed_pair'
+  pairingMode: 'individual' | 'fixed_pair',
+  advancedSettings?: TournamentAdvancedSettings
 ): LeaderboardEntry[] {
   const statsMap = new Map<string, LeaderboardEntry>();
 
@@ -1065,14 +1233,5 @@ export function recalculateLeaderboard(
     winRate: e.matchesPlayed > 0 ? Math.round((e.matchesWon / e.matchesPlayed) * 100) : 0
   }));
 
-  // Sort criteria: Points Won (desc) > Point Diff (desc) > Matches Won (desc) > Least Matches Played > Name
-  entries.sort((a, b) => {
-    if (b.pointsWon !== a.pointsWon) return b.pointsWon - a.pointsWon;
-    if (b.pointDiff !== a.pointDiff) return b.pointDiff - a.pointDiff;
-    if (b.matchesWon !== a.matchesWon) return b.matchesWon - a.matchesWon;
-    if (a.matchesPlayed !== b.matchesPlayed) return a.matchesPlayed - b.matchesPlayed;
-    return a.name.localeCompare(b.name);
-  });
-
-  return entries;
+  return sortLeaderboardWithAdvancedRules(entries, rounds, advancedSettings);
 }

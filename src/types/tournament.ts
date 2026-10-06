@@ -25,6 +25,22 @@ export function getTournamentVisibility(
   return 'public';
 }
 
+export type PairingAlgorithm = 'smart_pairing' | 'strict_ranking';
+export type ScoringType = 'points' | 'sets';
+export type TiebreakingRule = 'allow_tied' | 'diff' | 'head_to_head';
+
+export interface TournamentAdvancedSettings {
+  tournamentName: string;
+  pairingAlgorithm: PairingAlgorithm;
+  scoringType: ScoringType;
+  pointsPerMatch: number; // 16, 21, 24, 32, or 5 (sets)
+  dateTime?: string; // YYYY-MM-DDTHH:mm
+  sortByWinsBeforePoints: boolean;
+  tiebreakingRule: TiebreakingRule;
+  hidePublicLeaderboard: boolean;
+  disableCompensationPoints: boolean;
+}
+
 export interface TournamentConfig {
   id: string;
   name: string;
@@ -39,6 +55,8 @@ export interface TournamentConfig {
   goldenPoint: boolean; // Punto de Oro at 40-40 deuce
   totalExpectedRounds: number;
   visibility?: TournamentVisibility; // 'public' (live score viewable by anyone) | 'private' (participants only)
+  dateTime?: string;
+  advancedSettings?: TournamentAdvancedSettings;
   joinRequests?: JoinRequest[];
 }
 
@@ -112,9 +130,12 @@ export interface LeaderboardEntry {
   pointsWon: number; // Total points or games won
   pointsConceded: number;
   pointDiff: number;
+  compensationPoints?: number; // Extra +M compensation points for fewer matches
+  effectivePoints?: number; // Total points including compensation
   sitOutCount: number;
   winRate: number;
   currentCourtLevel?: number;
+  rank?: number;
 }
 
 export interface TournamentState {

@@ -5,7 +5,9 @@ import type {
   Player,
   Court,
   TournamentVisibility,
-  JoinRequest
+  JoinRequest,
+  TournamentAdvancedSettings,
+  FixedPointsOption
 } from './types/tournament';
 import { getTournamentVisibility } from './types/tournament';
 import type { User } from '@supabase/supabase-js';
@@ -17,6 +19,7 @@ import { PodiumModal } from './components/PodiumModal';
 import { AuthModal } from './components/AuthModal';
 import { JoinInviteModal } from './components/JoinInviteModal';
 import { JoinRequestsModal } from './components/JoinRequestsModal';
+import { TournamentSettingsModal } from './components/TournamentSettingsModal';
 import { generateNextRound, recalculateLeaderboard } from './utils/scheduler';
 import { translations, type Language } from './utils/translations';
 import {
@@ -43,7 +46,8 @@ import {
   Zap,
   Info,
   LogIn,
-  UserPlus
+  UserPlus,
+  Settings
 } from 'lucide-react';
 
 const STORAGE_KEY = 'pdl_up_tournaments_v1';
@@ -106,7 +110,7 @@ function createSampleTournament(
     1
   );
 
-  const initialLb = recalculateLeaderboard(updatedPlayers, [r1], pairingMode);
+  const initialLb = recalculateLeaderboard(updatedPlayers, [r1], pairingMode, config.advancedSettings);
 
   return {
     id,
@@ -302,6 +306,7 @@ export function App() {
 
   // Active Tournament UI States
   const [isSetupOpen, setIsSetupOpen] = useState<boolean>(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false);
   const [showPodium, setShowPodium] = useState<boolean>(false);
   const [activeTabRound, setActiveTabRound] = useState<number>(0);
 
@@ -463,7 +468,8 @@ export function App() {
     const newLb = recalculateLeaderboard(
       activeRecord.players,
       updatedRounds,
-      activeRecord.config.pairingMode
+      activeRecord.config.pairingMode,
+      activeRecord.config.advancedSettings
     );
 
     const updatedRecord: TournamentRecord = {
@@ -503,7 +509,8 @@ export function App() {
     const newLb = recalculateLeaderboard(
       activeRecord.players,
       updatedRounds,
-      activeRecord.config.pairingMode
+      activeRecord.config.pairingMode,
+      activeRecord.config.advancedSettings
     );
 
     const updatedRecord: TournamentRecord = {
@@ -533,7 +540,8 @@ export function App() {
     const freshLeaderboard = recalculateLeaderboard(
       activeRecord.players,
       updatedRoundsSoFar,
-      activeRecord.config.pairingMode
+      activeRecord.config.pairingMode,
+      activeRecord.config.advancedSettings
     );
 
     const nextRoundNumber = activeRecord.rounds.length + 1;
@@ -551,7 +559,8 @@ export function App() {
     const newLb = recalculateLeaderboard(
       updatedPlayers,
       newRounds,
-      activeRecord.config.pairingMode
+      activeRecord.config.pairingMode,
+      activeRecord.config.advancedSettings
     );
 
     const updatedRecord: TournamentRecord = {
@@ -565,6 +574,41 @@ export function App() {
 
     setTournaments(tournaments.map(t => (t.id === activeRecord.id ? updatedRecord : t)));
     setActiveTabRound(newRounds.length - 1);
+    if (user) {
+      upsertTournamentDb(updatedRecord, user.id).catch(console.error);
+    }
+  };
+
+  const handleSaveAdvancedSettings = (newSettings: TournamentAdvancedSettings) => {
+    if (!activeRecord) return;
+
+    const isFixedPts = newSettings.scoringType === 'points';
+    const updatedConfig: TournamentConfig = {
+      ...activeRecord.config,
+      name: newSettings.tournamentName,
+      scoringSystem: isFixedPts ? 'fixed_points' : 'tennis_games',
+      targetPoints: isFixedPts ? (newSettings.pointsPerMatch as FixedPointsOption) : activeRecord.config.targetPoints,
+      totalGamesTarget: !isFixedPts ? newSettings.pointsPerMatch : activeRecord.config.totalGamesTarget,
+      dateTime: newSettings.dateTime,
+      advancedSettings: newSettings
+    };
+
+    const newLb = recalculateLeaderboard(
+      activeRecord.players,
+      activeRecord.rounds,
+      updatedConfig.pairingMode,
+      newSettings
+    );
+
+    const updatedRecord: TournamentRecord = {
+      ...activeRecord,
+      name: newSettings.tournamentName,
+      config: updatedConfig,
+      leaderboard: newLb,
+      lastUpdated: Date.now()
+    };
+
+    setTournaments(prev => prev.map(t => (t.id === activeRecord.id ? updatedRecord : t)));
     if (user) {
       upsertTournamentDb(updatedRecord, user.id).catch(console.error);
     }
@@ -680,7 +724,8 @@ export function App() {
         const updatedLb = recalculateLeaderboard(
           updatedPlayers,
           t.rounds,
-          t.config.pairingMode
+          t.config.pairingMode,
+          t.config.advancedSettings
         );
 
         const updatedTourney: TournamentRecord = {
@@ -745,7 +790,12 @@ export function App() {
       1
     );
 
-    const newLb = recalculateLeaderboard(updatedPlayers, [r1], newConfig.pairingMode);
+    const newLb = recalculateLeaderboard(
+      updatedPlayers,
+      [r1],
+      newConfig.pairingMode,
+      newConfig.advancedSettings
+    );
 
     const updatedRecord: TournamentRecord = {
       ...activeRecord,
@@ -1441,6 +1491,16 @@ export function App() {
               <>
                 <button
                   type="button"
+                  onClick={() => setIsSettingsModalOpen(true)}
+                  className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                  title="Tournament Settings & Advanced Rules"
+                >
+                  <Settings className="w-3.5 h-3.5 text-slate-600" />
+                  <span className="hidden md:inline">{lang === 'id' ? 'Pengaturan' : 'Settings'}</span>
+                </button>
+
+                <button
+                  type="button"
                   onClick={() => setIsSetupOpen(!isSetupOpen)}
                   className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
                 >
@@ -1500,6 +1560,7 @@ export function App() {
             onUpdateVisibility={handleUpdateVisibility}
             onOpenRequestsModal={() => setRequestsModalTourneyId(config.id)}
             pendingRequestsCount={pendingRequestsInRunner.length}
+            onOpenAdvancedSettings={() => setIsSettingsModalOpen(true)}
           />
         )}
 
@@ -1629,6 +1690,8 @@ export function App() {
               config={config}
               lang={lang}
               currentRound={currentRound?.roundNumber || 1}
+              isSpectatorMode={isSpectatorMode}
+              isCompleted={activeRecord?.status === 'completed'}
             />
           </div>
         </div>
@@ -1682,6 +1745,28 @@ export function App() {
         onApproveRequest={handleApproveRequest}
         onRejectRequest={handleRejectRequest}
       />
+
+      {/* Tournament Settings & Advanced Rules Modal */}
+      {activeRecord && (
+        <TournamentSettingsModal
+          isOpen={isSettingsModalOpen}
+          onClose={() => setIsSettingsModalOpen(false)}
+          tournamentName={activeRecord.name}
+          currentSettings={activeRecord.config.advancedSettings || {
+            tournamentName: activeRecord.name,
+            pairingAlgorithm: 'smart_pairing',
+            scoringType: activeRecord.config.scoringSystem === 'fixed_points' ? 'points' : 'sets',
+            pointsPerMatch: activeRecord.config.scoringSystem === 'fixed_points' ? activeRecord.config.targetPoints : activeRecord.config.totalGamesTarget,
+            dateTime: activeRecord.config.dateTime,
+            sortByWinsBeforePoints: false,
+            tiebreakingRule: 'diff',
+            hidePublicLeaderboard: false,
+            disableCompensationPoints: false
+          }}
+          onSave={handleSaveAdvancedSettings}
+          lang={lang}
+        />
+      )}
     </div>
   );
 }

@@ -9,7 +9,8 @@ import {
   Crown,
   Coffee,
   ArrowUpDown,
-  Users
+  Users,
+  EyeOff
 } from 'lucide-react';
 
 interface LeaderboardPanelProps {
@@ -17,17 +18,25 @@ interface LeaderboardPanelProps {
   config: TournamentConfig;
   lang: Language;
   currentRound: number;
+  isSpectatorMode?: boolean;
+  isCompleted?: boolean;
 }
 
 export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
   leaderboard,
   config,
   lang,
-  currentRound
+  currentRound,
+  isSpectatorMode = false,
+  isCompleted = false
 }) => {
   const t = translations[lang];
   const [searchQuery, setSearchQuery] = useState('');
   const [copied, setCopied] = useState(false);
+
+  const isHiddenForSpectators = Boolean(
+    config.advancedSettings?.hidePublicLeaderboard && isSpectatorMode && !isCompleted
+  );
 
   const filtered = leaderboard.filter(e =>
     e.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -123,15 +132,32 @@ export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
 
       {/* Standings List */}
       <div className="flex-1 overflow-y-auto p-3 space-y-2 max-h-[580px]">
-        {filtered.length === 0 ? (
+        {isHiddenForSpectators ? (
+          <div className="py-12 px-4 text-center space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto shadow-2xs">
+              <EyeOff className="w-6 h-6" />
+            </div>
+            <h4 className="text-sm font-bold text-slate-800">
+              {lang === 'id' ? 'Klasemen Publik Disembunyikan' : 'Public Standings Hidden'}
+            </h4>
+            <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
+              {lang === 'id'
+                ? 'Peringkat klasemen disembunyikan oleh penyelenggara dan akan diumumkan secara lengkap setelah seluruh putaran selesai.'
+                : 'Standings are hidden during the tournament. Rankings will be revealed once the tournament is finished.'}
+            </p>
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="text-center py-10 text-slate-400 text-xs font-medium">
             {t.noScoresYet}
           </div>
         ) : (
           filtered.map((entry, idx) => {
-            const isTop1 = idx === 0;
-            const isTop2 = idx === 1;
-            const isTop3 = idx === 2;
+            const displayRank = entry.rank ?? (idx + 1);
+            const isTop1 = displayRank === 1;
+            const isTop2 = displayRank === 2;
+            const isTop3 = displayRank === 3;
+            const displayPoints = entry.effectivePoints ?? entry.pointsWon;
+            const hasComp = Boolean(entry.compensationPoints && entry.compensationPoints > 0);
 
             return (
               <div
@@ -159,7 +185,7 @@ export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
                         : 'bg-slate-100 text-slate-600'
                     }`}
                   >
-                    {idx + 1}
+                    {displayRank}
                   </div>
 
                   <div className="min-w-0">
@@ -185,8 +211,16 @@ export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
                 {/* Right: Points & Differential */}
                 <div className="flex items-center gap-3 text-right shrink-0">
                   <div>
-                    <div className="text-base font-bold font-mono text-slate-900 tabular-nums">
-                      {entry.pointsWon}
+                    <div className="text-base font-bold font-mono text-slate-900 tabular-nums flex items-center justify-end gap-1">
+                      <span>{displayPoints}</span>
+                      {hasComp && (
+                        <span
+                          className="text-[9px] font-bold text-emerald-700 bg-emerald-100/80 px-1 py-0.2 rounded border border-emerald-300"
+                          title={`Raw: ${entry.pointsWon} + ${entry.compensationPoints} Compensation (+M)`}
+                        >
+                          +{entry.compensationPoints}M
+                        </span>
+                      )}
                     </div>
                     <div className="text-[9px] text-slate-400 uppercase font-semibold">
                       {config.scoringSystem === 'tennis_games' ? t.totalGamesCol : t.totalPointsCol}
@@ -222,7 +256,9 @@ export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
           <Users className="w-3.5 h-3.5 text-emerald-600" />
           <span>{t.registeredParticipantsFooter(leaderboard.length, isFixedPair)}</span>
         </span>
-        <span className="text-[10px] text-slate-400">{t.rankingCriteria}</span>
+        <span className="text-[10px] text-slate-400 font-mono font-medium">
+          {config.advancedSettings?.sortByWinsBeforePoints ? 'W > PTS > DIFF' : t.rankingCriteria}
+        </span>
       </div>
     </div>
   );

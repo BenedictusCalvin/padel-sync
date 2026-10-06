@@ -38,6 +38,7 @@ interface SetupAccordionProps {
   onUpdateVisibility?: (newVisibility: TournamentVisibility) => void;
   onOpenRequestsModal?: () => void;
   pendingRequestsCount?: number;
+  onOpenAdvancedSettings?: () => void;
 }
 
 const PRESET_PLAYER_NAMES = [
@@ -68,7 +69,8 @@ export const SetupAccordion: React.FC<SetupAccordionProps> = ({
   onApplyConfig,
   onUpdateVisibility,
   onOpenRequestsModal,
-  pendingRequestsCount = 0
+  pendingRequestsCount = 0,
+  onOpenAdvancedSettings
 }) => {
   const t = translations[lang];
 
@@ -741,23 +743,36 @@ export const SetupAccordion: React.FC<SetupAccordionProps> = ({
           </div>
 
           {/* Section 5: Apply & Restart Button */}
-          <div className="pt-4 border-t border-slate-200/80 flex items-center justify-end gap-3">
-            <button
-              type="button"
-              onClick={onToggleOpen}
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl cursor-pointer"
-            >
-              {t.cancelBtn}
-            </button>
-            <button
-              type="button"
-              onClick={handleApply}
-              disabled={!isCapacitySufficient}
-              className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl shadow-xs flex items-center gap-2 cursor-pointer disabled:opacity-40"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>{t.applyAndRegenerate}</span>
-            </button>
+          <div className="pt-4 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-3">
+            {onOpenAdvancedSettings && (
+              <button
+                type="button"
+                onClick={onOpenAdvancedSettings}
+                className="px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+                title="Tournament Settings & Advanced Rules"
+              >
+                <span>⚙️</span>
+                <span>{lang === 'id' ? 'Pengaturan Lanjutan (Advanced Rules)' : 'Advanced Rules & Settings'}</span>
+              </button>
+            )}
+            <div className="flex items-center gap-3 ml-auto">
+              <button
+                type="button"
+                onClick={onToggleOpen}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl cursor-pointer"
+              >
+                {t.cancelBtn}
+              </button>
+              <button
+                type="button"
+                onClick={handleApply}
+                disabled={!isCapacitySufficient}
+                className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl shadow-xs flex items-center gap-2 cursor-pointer disabled:opacity-40"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>{t.applyAndRegenerate}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
