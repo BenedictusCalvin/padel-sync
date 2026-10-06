@@ -38,7 +38,7 @@ export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
   const handleShare = () => {
     const text = `🏆 *PDL UP LIVE STANDINGS (Round ${currentRound})*\n` +
       `Format: ${config.format.toUpperCase()} (${isFixedPair ? 'Fixed Pairs' : 'Individual'})\n` +
-      `Scoring: ${config.scoringSystem === 'fixed_points' ? `Fixed ${config.targetPoints} Pts` : `${config.tennisGameMode === 'total_games' ? `Total ${config.totalGamesTarget} Games` : `Race to ${config.raceToGamesTarget} Games`}`}\n\n` +
+      `Scoring: ${config.scoringSystem === 'fixed_points' ? `Fixed ${config.targetPoints} Pts` : `${config.tennisGameMode === 'total_games' ? `Total ${config.totalGamesTarget} Sets` : `Race to ${config.raceToGamesTarget} Sets`}`}\n\n` +
       leaderboard
         .slice(0, 10)
         .map((e, idx) => {
@@ -116,7 +116,7 @@ export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
           <span>{isFixedPair ? (lang === 'id' ? 'Pasangan Tim' : 'Team') : (lang === 'id' ? 'Pemain' : 'Player')}</span>
         </div>
         <div className="flex items-center gap-3 text-right">
-          <span className="w-10 text-right">{config.scoringSystem === 'tennis_games' ? 'Games' : 'Poin'}</span>
+          <span className="w-10 text-right">{config.scoringSystem === 'tennis_games' ? (lang === 'id' ? 'Set' : 'Sets') : 'Poin'}</span>
           <span className="w-12 text-right">+/- Diff</span>
         </div>
       </div>

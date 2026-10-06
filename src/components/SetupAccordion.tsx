@@ -234,8 +234,8 @@ export const SetupAccordion: React.FC<SetupAccordionProps> = ({
                 {scoringSystem === 'fixed_points'
                   ? `Fixed ${targetPoints} Pts`
                   : tennisGameMode === 'total_games'
-                  ? `Tennis: Total of ${totalGamesTarget} Games`
-                  : `Tennis: Race to ${raceToGamesTarget} Games`}
+                  ? `Tennis: Total of ${totalGamesTarget} Sets`
+                  : `Tennis: Race to ${raceToGamesTarget} Sets`}
               </span>
             </div>
           </div>
@@ -532,14 +532,23 @@ export const SetupAccordion: React.FC<SetupAccordionProps> = ({
                   >
                     <div className="font-bold text-xs text-sky-800 mb-1">{t.totalGamesOption}</div>
                     <div className="flex items-center gap-2 mt-2">
-                      <input
-                        type="number"
-                        min={2}
-                        max={16}
-                        value={totalGamesTarget}
-                        onChange={e => setTotalGamesTarget(Math.max(2, Number(e.target.value) || 6))}
-                        className="w-20 px-2 py-1 bg-white border border-slate-200 rounded-lg text-center font-bold text-slate-900 text-sm shadow-2xs"
-                      />
+                      <div className="relative shrink-0" onClick={e => e.stopPropagation()}>
+                        <select
+                          value={totalGamesTarget}
+                          onChange={e => {
+                            setTotalGamesTarget(Number(e.target.value));
+                            setTennisGameMode('total_games');
+                          }}
+                          className="appearance-none w-20 pl-2.5 pr-6 py-1.5 bg-white border border-slate-200 hover:border-sky-400 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 rounded-lg text-center font-bold text-slate-900 text-sm shadow-2xs cursor-pointer transition-all outline-none"
+                        >
+                          {[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16].map(num => (
+                            <option key={num} value={num}>
+                              {num}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      </div>
                       <span className="text-[11px] text-slate-500">
                         {t.totalGamesDesc}
                       </span>
@@ -556,14 +565,23 @@ export const SetupAccordion: React.FC<SetupAccordionProps> = ({
                   >
                     <div className="font-bold text-xs text-sky-800 mb-1">{t.raceToOption}</div>
                     <div className="flex items-center gap-2 mt-2">
-                      <input
-                        type="number"
-                        min={2}
-                        max={12}
-                        value={raceToGamesTarget}
-                        onChange={e => setRaceToGamesTarget(Math.max(2, Number(e.target.value) || 6))}
-                        className="w-20 px-2 py-1 bg-white border border-slate-200 rounded-lg text-center font-bold text-slate-900 text-sm shadow-2xs"
-                      />
+                      <div className="relative shrink-0" onClick={e => e.stopPropagation()}>
+                        <select
+                          value={raceToGamesTarget}
+                          onChange={e => {
+                            setRaceToGamesTarget(Number(e.target.value));
+                            setTennisGameMode('race_to');
+                          }}
+                          className="appearance-none w-20 pl-2.5 pr-6 py-1.5 bg-white border border-slate-200 hover:border-sky-400 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 rounded-lg text-center font-bold text-slate-900 text-sm shadow-2xs cursor-pointer transition-all outline-none"
+                        >
+                          {[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(num => (
+                            <option key={num} value={num}>
+                              {num}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      </div>
                       <span className="text-[11px] text-slate-500">
                         {t.raceToDesc}
                       </span>

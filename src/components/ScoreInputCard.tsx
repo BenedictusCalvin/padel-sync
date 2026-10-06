@@ -121,8 +121,8 @@ export const ScoreInputCard: React.FC<ScoreInputCardProps> = ({
           {/* Scoring rule indicator badge */}
           <span className="text-[11px] font-medium font-mono text-emerald-700 px-2 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200/70">
             {isFixedPoints && `Fixed ${config.targetPoints} Pts`}
-            {isTotalGames && `Total ${config.totalGamesTarget} Games`}
-            {isRaceToGames && `Race to ${config.raceToGamesTarget} Games`}
+            {isTotalGames && `Total ${config.totalGamesTarget} Sets`}
+            {isRaceToGames && `Race to ${config.raceToGamesTarget} Sets`}
           </span>
 
           {config.goldenPoint && (
@@ -253,7 +253,7 @@ export const ScoreInputCard: React.FC<ScoreInputCardProps> = ({
           <div className="col-span-1 flex flex-col items-center justify-center">
             <span className="text-xs font-black text-slate-400 tracking-wider">VS</span>
             <span className="text-[10px] text-slate-500 font-mono mt-1 text-center font-medium">
-              {isComplementary ? `${scoreA + scoreB}/${targetLimit}` : 'Games'}
+              {isComplementary ? `${scoreA + scoreB}/${targetLimit}` : 'Sets'}
             </span>
           </div>
 

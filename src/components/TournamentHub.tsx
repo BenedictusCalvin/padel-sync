@@ -32,7 +32,8 @@ import {
   Lock,
   Share2,
   Check,
-  UserPlus
+  UserPlus,
+  ChevronDown
 } from 'lucide-react';
 import { ReclubImportModal } from './ReclubImportModal';
 import { TournamentVisibilityBadge } from './TournamentVisibilityBadge';
@@ -948,14 +949,23 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                         }`}
                       >
                         <span className="font-bold block text-cyan-700">{t.totalGamesOption}</span>
-                        <input
-                          type="number"
-                          min={2}
-                          max={16}
-                          value={totalGamesTarget}
-                          onChange={e => setTotalGamesTarget(Number(e.target.value) || 6)}
-                          className="w-16 px-2 py-0.5 bg-slate-50 border border-slate-200 rounded text-center font-bold text-slate-900 text-xs mt-1"
-                        />
+                        <div className="relative mt-1" onClick={e => e.stopPropagation()}>
+                          <select
+                            value={totalGamesTarget}
+                            onChange={e => {
+                              setTotalGamesTarget(Number(e.target.value));
+                              setTennisGameMode('total_games');
+                            }}
+                            className="w-full appearance-none px-2 py-1 pr-6 bg-slate-50 hover:bg-white border border-slate-200 rounded text-center font-bold text-slate-900 text-xs shadow-2xs cursor-pointer transition-all outline-none focus:border-cyan-500"
+                          >
+                            {[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16].map(num => (
+                              <option key={num} value={num}>
+                                {num} Set
+                              </option>
+                            ))}
+                          </select>
+                          <ChevronDown className="w-3 h-3 text-slate-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        </div>
                       </div>
 
                       <div
@@ -965,14 +975,23 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                         }`}
                       >
                         <span className="font-bold block text-cyan-700">{t.raceToOption}</span>
-                        <input
-                          type="number"
-                          min={2}
-                          max={12}
-                          value={raceToGamesTarget}
-                          onChange={e => setRaceToGamesTarget(Number(e.target.value) || 6)}
-                          className="w-16 px-2 py-0.5 bg-slate-50 border border-slate-200 rounded text-center font-bold text-slate-900 text-xs mt-1"
-                        />
+                        <div className="relative mt-1" onClick={e => e.stopPropagation()}>
+                          <select
+                            value={raceToGamesTarget}
+                            onChange={e => {
+                              setRaceToGamesTarget(Number(e.target.value));
+                              setTennisGameMode('race_to');
+                            }}
+                            className="w-full appearance-none px-2 py-1 pr-6 bg-slate-50 hover:bg-white border border-slate-200 rounded text-center font-bold text-slate-900 text-xs shadow-2xs cursor-pointer transition-all outline-none focus:border-cyan-500"
+                          >
+                            {[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(num => (
+                              <option key={num} value={num}>
+                                {num} Set
+                              </option>
+                            ))}
+                          </select>
+                          <ChevronDown className="w-3 h-3 text-slate-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        </div>
                       </div>
                     </div>
 
