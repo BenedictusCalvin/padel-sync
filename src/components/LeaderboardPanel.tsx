@@ -109,6 +109,18 @@ export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
         </div>
       </div>
 
+      {/* Column Headers for Maximum Clarity */}
+      <div className="px-4 py-1.5 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none">
+        <div className="flex items-center gap-2.5">
+          <span className="w-6 text-center">#</span>
+          <span>{isFixedPair ? (lang === 'id' ? 'Pasangan Tim' : 'Team') : (lang === 'id' ? 'Pemain' : 'Player')}</span>
+        </div>
+        <div className="flex items-center gap-3 text-right">
+          <span className="w-10 text-right">{config.scoringSystem === 'tennis_games' ? 'Games' : 'Poin'}</span>
+          <span className="w-12 text-right">+/- Diff</span>
+        </div>
+      </div>
+
       {/* Standings List */}
       <div className="flex-1 overflow-y-auto p-3 space-y-2 max-h-[580px]">
         {filtered.length === 0 ? (
