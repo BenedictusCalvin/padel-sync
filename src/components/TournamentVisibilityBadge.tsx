@@ -62,7 +62,7 @@ export const TournamentVisibilityBadge: React.FC<TournamentVisibilityBadgeProps>
       type="button"
       onClick={handleToggle}
       disabled={disabled}
-      className={`relative w-[78px] h-[24px] rounded-md border text-[11px] font-medium flex items-center justify-center gap-1.5 transition-colors duration-300 ease-out cursor-pointer select-none shrink-0 ${
+      className={`badge-toggle-btn no-press-anim relative w-[78px] h-[24px] rounded-md border text-[11px] font-medium flex items-center justify-center gap-1.5 cursor-pointer select-none shrink-0 ${
         isPrivate
           ? 'bg-amber-50 hover:bg-amber-100/80 border-amber-200/90 text-amber-800'
           : 'bg-emerald-50 hover:bg-emerald-100/80 border-emerald-200/90 text-emerald-800'
@@ -74,7 +74,7 @@ export const TournamentVisibilityBadge: React.FC<TournamentVisibilityBadgeProps>
       {isRadarPinging && (
         <>
           <span
-            className="absolute -inset-1 rounded-lg border-2 border-emerald-400 opacity-80 animate-radar-ping pointer-events-none z-10"
+            className="absolute -inset-1.5 rounded-lg border-2 border-emerald-400 opacity-80 animate-radar-ping pointer-events-none z-10"
             aria-hidden="true"
           />
           <span
@@ -95,22 +95,22 @@ export const TournamentVisibilityBadge: React.FC<TournamentVisibilityBadgeProps>
         <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 border border-white shadow-2xs" />
       </span>
 
-      {/* 3. Morphing Icon Wrapper (Fixed width & height with smooth scale & rotate transition) */}
+      {/* 3. Morphing Icon Wrapper (Persistent absolute positioning on both icons ensures CSS transform & opacity transitions ALWAYS run) */}
       <div className="w-3.5 h-3.5 relative flex items-center justify-center shrink-0">
         {/* Lock Icon */}
         <Lock
-          className={`w-3.5 h-3.5 text-amber-600 transition-all duration-300 ease-out transform ${
+          className={`w-3.5 h-3.5 absolute inset-0 m-auto text-amber-600 transition-all duration-300 ease-out transform ${
             isPrivate
               ? 'opacity-100 scale-100 rotate-0'
-              : 'opacity-0 scale-50 rotate-45 pointer-events-none absolute'
+              : 'opacity-0 scale-50 rotate-90 pointer-events-none'
           }`}
         />
         {/* Globe Icon */}
         <Globe
-          className={`w-3.5 h-3.5 text-emerald-600 transition-all duration-300 ease-out transform ${
+          className={`w-3.5 h-3.5 absolute inset-0 m-auto text-emerald-600 transition-all duration-300 ease-out transform ${
             !isPrivate
               ? 'opacity-100 scale-100 rotate-0'
-              : 'opacity-0 scale-50 -rotate-45 pointer-events-none absolute'
+              : 'opacity-0 scale-50 -rotate-90 pointer-events-none'
           }`}
         />
       </div>

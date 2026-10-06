@@ -109,6 +109,15 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
   const [visibilityFilter, setVisibilityFilter] = useState<'all' | 'public' | 'private'>('all');
   const [copiedShareId, setCopiedShareId] = useState<string | null>(null);
   const [copiedInviteId, setCopiedInviteId] = useState<string | null>(null);
+  const [justToggledTourneyId, setJustToggledTourneyId] = useState<string | null>(null);
+
+  const handleToggleVisibility = (tourneyId: string, newVis: TournamentVisibility) => {
+    setJustToggledTourneyId(tourneyId);
+    setTimeout(() => {
+      setJustToggledTourneyId(null);
+    }, 1500);
+    onUpdateTournamentVisibility?.(tourneyId, newVis);
+  };
 
   const handleCopyShareLink = (e: React.MouseEvent, tourneyId: string) => {
     e.stopPropagation();
@@ -464,11 +473,39 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                     : `Race ${tourney.config.raceToGamesTarget}G`;
                   const formatSummary = `${formatName} • ${targetLabel}${isFixedPair ? ' • Pair' : ''}`;
 
+                  const isJustToggled = justToggledTourneyId === tourney.id;
+
                   return (
                     <div
                       key={tourney.id}
-                      className="rounded-2xl border border-slate-200/80 hover:border-slate-300 bg-white hover:bg-slate-50/40 transition-all duration-200 shadow-sm hover:shadow-md flex flex-col justify-between group overflow-hidden"
+                      className={`relative rounded-2xl bg-white border transition-all duration-500 shadow-sm hover:shadow-md flex flex-col justify-between group overflow-hidden ${
+                        isJustToggled
+                          ? isPrivate
+                            ? 'ring-2 ring-amber-400/80 border-amber-300 shadow-lg shadow-amber-500/10 scale-[1.015]'
+                            : 'ring-2 ring-emerald-400/80 border-emerald-300 shadow-lg shadow-emerald-500/10 scale-[1.015]'
+                          : isPrivate
+                          ? 'border-slate-200/80 hover:border-amber-300/80'
+                          : 'border-slate-200/80 hover:border-emerald-300/80'
+                      }`}
                     >
+                      {/* Top Accent Strip with smooth color transition between Public and Private */}
+                      <div
+                        className={`h-1.5 w-full transition-all duration-500 ease-out shrink-0 ${
+                          isPrivate
+                            ? 'bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400'
+                            : 'bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400'
+                        }`}
+                      />
+
+                      {/* Ripple Flash on Card during transition */}
+                      {isJustToggled && (
+                        <div
+                          className={`absolute inset-0 pointer-events-none animate-card-flash z-30 ${
+                            isPrivate ? 'bg-amber-400/10' : 'bg-emerald-400/10'
+                          }`}
+                        />
+                      )}
+
                       {/* Card Header (CLICKABLE TO OPEN MATCHMAKER) */}
                       <div
                         onClick={() => onSelectTournament(tourney.id)}
@@ -528,7 +565,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                             <TournamentVisibilityBadge
                               tournamentId={tourney.id}
                               visibility={getTournamentVisibility(tourney)}
-                              onToggle={onUpdateTournamentVisibility}
+                              onToggle={handleToggleVisibility}
                               lang={lang}
                             />
                           </div>
