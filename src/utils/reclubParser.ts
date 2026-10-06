@@ -42,15 +42,15 @@ export function parseReclubText(rawText: string): string[] {
     text = text.replace(/^(\d+[\.\)\-:#]|\#\d+)\s*/, '');
 
     // Strip common trailing status badges: (Going), [Paid], (Host), - Paid, etc.
-    text = text.replace(/\s*[\(\[\{](going|attending|paid|unpaid|host|organizer|admin|waitlist|guest|checked in|member|player)[\)\]\}]/gi, '');
+    text = text.replace(/\s*[([{](going|attending|paid|unpaid|host|organizer|admin|waitlist|guest|checked in|member|player)[)\]}]/gi, '');
     text = text.replace(/\s*-\s*(going|attending|paid|unpaid|host|organizer|waitlist|paid\s*via\s*reclub)$/gi, '');
     
     // Strip trailing or leading emojis and bullet characters (•, -, *, etc.)
-    text = text.replace(/^[\s\-\*\•\–\—\>\#\@]+/, '');
+    text = text.replace(/^[\s\-*•–—>#@]+/, '');
     text = text.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
 
     // Strip skill rating mentions like "(3.5)" or "3.5 DUPR"
-    text = text.replace(/\s*[\(\[]?(\b\d\.\d\b|\bdupr\b)[\)\]]?/gi, '');
+    text = text.replace(/\s*[([\]]?(\b\d\.\d\b|\bdupr\b)[)\]]?/gi, '');
 
     // Final trim
     text = text.trim();
@@ -98,3 +98,5 @@ export function parseCSVAttendees(csvContent: string): string[] {
   // Fallback: parse entire content line by line using the smart Reclub parser
   return parseReclubText(csvContent);
 }
+
+export * from './reclubApi';
