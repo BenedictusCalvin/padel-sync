@@ -6,13 +6,12 @@ import {
   Search,
   Share2,
   Check,
-  Flame,
   LayoutList,
   Table as TableIcon,
   ChevronDown,
-  ChevronUp,
   HelpCircle,
-  EyeOff
+  EyeOff,
+  ArrowLeft
 } from 'lucide-react';
 
 export interface PdlUpLeaderboardProps {
@@ -24,6 +23,7 @@ export interface PdlUpLeaderboardProps {
   isSpectatorMode?: boolean;
   isCompleted?: boolean;
   hidePublicLeaderboard?: boolean;
+  onBackToMatches?: () => void;
   className?: string;
 }
 
@@ -36,25 +36,49 @@ export const PdlUpLeaderboard: React.FC<PdlUpLeaderboardProps> = ({
   isSpectatorMode = false,
   isCompleted = false,
   hidePublicLeaderboard = false,
+  onBackToMatches,
   className = ''
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'points' | 'wins'>('points');
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
-  const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [showLegend, setShowLegend] = useState(false);
 
   // Privacy Rule: Sembunyikan klasemen untuk pengunjung publik jika opsi aktif dan belum rampung
   const isLockedForPublic = Boolean(hidePublicLeaderboard && isSpectatorMode && !isCompleted);
 
-  // Filter Search
-  const filteredRows = useMemo(() => {
-    if (!searchQuery.trim()) return rows;
-    const query = searchQuery.toLowerCase().trim();
-    return rows.filter(r => r.name.toLowerCase().includes(query));
-  }, [rows, searchQuery]);
+  // 1. Sort Rows dynamically (BY POINTS vs BY WINS)
+  const sortedRows = useMemo(() => {
+    const list = [...rows];
+    if (sortBy === 'wins') {
+      list.sort((a, b) => {
+        if (b.wins !== a.wins) return b.wins - a.wins;
+        if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+        return b.pointDiff - a.pointDiff;
+      });
+    } else {
+      list.sort((a, b) => {
+        if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+        if (b.pointDiff !== a.pointDiff) return b.pointDiff - a.pointDiff;
+        return b.wins - a.wins;
+      });
+    }
 
-  // Handle Share / Copy Standings
+    return list.map((item, idx) => ({
+      ...item,
+      rank: idx + 1
+    }));
+  }, [rows, sortBy]);
+
+  // 2. Filter Search
+  const filteredRows = useMemo(() => {
+    if (!searchQuery.trim()) return sortedRows;
+    const query = searchQuery.toLowerCase().trim();
+    return sortedRows.filter(r => r.name.toLowerCase().includes(query));
+  }, [sortedRows, searchQuery]);
+
+  // 3. Handle Share / Copy Standings
   const handleCopyStandings = () => {
     if (onShare) {
       onShare();
@@ -64,13 +88,13 @@ export const PdlUpLeaderboard: React.FC<PdlUpLeaderboardProps> = ({
     const header = `🏆 *${tournamentTitle.toUpperCase()} - LIVE STANDINGS*\n` +
       (currentRound ? `📍 Round: ${currentRound}\n\n` : '\n');
 
-    const body = rows
+    const body = sortedRows
       .slice(0, 16)
       .map((r, i) => {
         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${r.rank}.`;
         const diffSign = r.pointDiff > 0 ? `+${r.pointDiff}` : `${r.pointDiff}`;
         const compStr = r.compensationPoints > 0 ? ` (+${r.compensationPoints}M)` : '';
-        return `${medal} *${r.name}* — ${r.totalPoints} pts (Diff ${diffSign})${compStr} [${r.wins}W-${r.losses}L-${r.ties}T]`;
+        return `${medal} *${r.name}* — ${r.totalPoints} ${scoringUnit === 'games' ? 'sets' : 'pts'} (Diff ${diffSign})${compStr} [${r.wins}W-${r.losses}L-${r.ties}T]`;
       })
       .join('\n');
 
@@ -82,7 +106,7 @@ export const PdlUpLeaderboard: React.FC<PdlUpLeaderboardProps> = ({
 
   if (isLockedForPublic) {
     return (
-      <div className={`bg-white rounded-3xl border border-slate-200/90 shadow-sm p-8 text-center space-y-4 ${className}`}>
+      <div className={`bg-white rounded-2xl border border-slate-200/80 shadow-sm p-8 text-center space-y-4 ${className}`}>
         <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto shadow-2xs">
           <EyeOff className="w-7 h-7" />
         </div>
@@ -97,18 +121,29 @@ export const PdlUpLeaderboard: React.FC<PdlUpLeaderboardProps> = ({
   }
 
   return (
-    <div className={`bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col ${className}`}>
+    <div className={`bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden flex flex-col ${className}`}>
       
       {/* 1. Header Toolbar */}
-      <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3.5 bg-white">
+      <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3.5 bg-white">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-500 text-white flex items-center justify-center shadow-xs shrink-0">
+          {onBackToMatches && (
+            <button
+              type="button"
+              onClick={onBackToMatches}
+              className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl border border-slate-200 transition-all cursor-pointer shadow-2xs md:hidden"
+              title="Kembali ke Pertandingan"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+          )}
+
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-white flex items-center justify-center shadow-xs shrink-0">
             <Trophy className="w-5 h-5 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-base font-bold text-slate-900 tracking-tight">
-                Klasemen Turnamen
+                Klasemen Turnamen PDL UP
               </h3>
               {currentRound && (
                 <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-bold font-mono border border-emerald-200">
@@ -119,13 +154,26 @@ export const PdlUpLeaderboard: React.FC<PdlUpLeaderboardProps> = ({
             <p className="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
               <span>{rows.length} Pemain Terdaftar</span>
               <span>•</span>
-              <span className="text-sky-600 font-medium">PDL UP Live Leaderboard</span>
+              <span className="text-blue-600 font-medium">PDL UP Standalone Leaderboard</span>
             </p>
           </div>
         </div>
 
-        {/* Action Buttons: View Toggle & Share */}
-        <div className="flex items-center gap-2 self-end sm:self-auto">
+        {/* Action Controls: Sort Selector, View Toggle & Share */}
+        <div className="flex items-center gap-2 flex-wrap self-end md:self-auto">
+          {/* Sorting Dropdown Filter (BY POINTS ▾ / BY WINS ▾) */}
+          <div className="relative inline-block text-left">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as 'points' | 'wins')}
+              className="appearance-none bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-200 rounded-xl pl-3 pr-7 py-1.5 text-xs font-bold uppercase tracking-wide cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-2xs"
+            >
+              <option value="points">BY POINTS ▾</option>
+              <option value="wins">BY WINS ▾</option>
+            </select>
+            <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
           {/* View Mode Switcher for Mobile/Desktop */}
           <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200 text-xs font-semibold">
             <button
@@ -133,30 +181,30 @@ export const PdlUpLeaderboard: React.FC<PdlUpLeaderboardProps> = ({
               onClick={() => setViewMode('table')}
               className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
                 viewMode === 'table'
-                  ? 'bg-white text-slate-900 shadow-2xs'
+                  ? 'bg-white text-slate-900 shadow-2xs font-bold'
                   : 'text-slate-500 hover:text-slate-900'
               }`}
-              title="Tampilan Tabel Detail"
+              title="Tampilan Tabel Lengkap"
             >
               <TableIcon className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">Tabel</span>
+              <span className="hidden sm:inline">Tabel</span>
             </button>
             <button
               type="button"
               onClick={() => setViewMode('cards')}
               className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
                 viewMode === 'cards'
-                  ? 'bg-white text-slate-900 shadow-2xs'
+                  ? 'bg-white text-slate-900 shadow-2xs font-bold'
                   : 'text-slate-500 hover:text-slate-900'
               }`}
-              title="Tampilan Kartu Kompak"
+              title="Tampilan Kartu Ringkas"
             >
               <LayoutList className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">Kartu</span>
+              <span className="hidden sm:inline">Kartu</span>
             </button>
           </div>
 
-          {/* Copy Standings */}
+          {/* Copy / Share Standings */}
           <button
             type="button"
             onClick={handleCopyStandings}
@@ -187,7 +235,7 @@ export const PdlUpLeaderboard: React.FC<PdlUpLeaderboardProps> = ({
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             placeholder="Cari nama pemain..."
-            className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 shadow-2xs"
+            className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
           />
         </div>
 
@@ -196,7 +244,7 @@ export const PdlUpLeaderboard: React.FC<PdlUpLeaderboardProps> = ({
           onClick={() => setShowLegend(!showLegend)}
           className={`px-2.5 py-1.5 rounded-xl border text-xs font-medium flex items-center gap-1 transition-all cursor-pointer ${
             showLegend
-              ? 'bg-sky-50 border-sky-200 text-sky-700'
+              ? 'bg-blue-50 border-blue-200 text-blue-700'
               : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
           }`}
           title="Panduan Keterangan Kolom"
@@ -208,17 +256,17 @@ export const PdlUpLeaderboard: React.FC<PdlUpLeaderboardProps> = ({
 
       {/* Legend Drawer */}
       {showLegend && (
-        <div className="p-3.5 bg-sky-50/60 border-b border-sky-100 text-[11px] text-slate-600 grid grid-cols-2 sm:grid-cols-4 gap-2.5 animate-in fade-in duration-150">
+        <div className="p-3.5 bg-blue-50/60 border-b border-blue-100 text-[11px] text-slate-600 grid grid-cols-2 sm:grid-cols-4 gap-2.5 animate-in fade-in duration-150">
           <div><strong className="text-slate-800 font-mono">G:</strong> Games / Match Dimainkan</div>
           <div><strong className="text-slate-800 font-mono">W / L / T:</strong> Win / Loss / Tie</div>
           <div><strong className="text-slate-800 font-mono">DIFF:</strong> Selisih Skor (+/-)</div>
           <div><strong className="text-slate-800 font-mono">+M:</strong> Poin Kompensasi Sit-Out</div>
-          <div><strong className="text-sky-700 font-mono">P:</strong> Total Poin (Klasemen)</div>
+          <div><strong className="text-blue-700 font-mono">P:</strong> Total Poin Utama (Biru Tebal)</div>
           <div className="col-span-2 sm:col-span-3 flex items-center gap-1.5">
-            <span className="font-semibold text-slate-700">Form:</span>
+            <span className="font-semibold text-slate-700">Form Dot:</span>
             <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" /> Win
             <span className="inline-block w-2 h-2 rounded-full bg-rose-500 ml-1.5" /> Loss
-            <span className="inline-block w-2 h-2 rounded-full bg-slate-400 ml-1.5" /> Tie
+            <span className="inline-block w-2 h-2 rounded-full bg-slate-300 ml-1.5" /> Tie
           </div>
         </div>
       )}
@@ -231,28 +279,27 @@ export const PdlUpLeaderboard: React.FC<PdlUpLeaderboardProps> = ({
             <button
               type="button"
               onClick={() => setSearchQuery('')}
-              className="text-sky-600 hover:underline cursor-pointer"
+              className="text-blue-600 hover:underline cursor-pointer"
             >
               Hapus pencarian
             </button>
           )}
         </div>
       ) : viewMode === 'table' ? (
-        /* --- A. DETAILED TABLE VIEW --- */
+        /* --- A. DETAILED FULL-WIDTH TABLE VIEW (Option B) --- */
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[640px]">
+          <table className="w-full text-left border-collapse min-w-[600px]">
             <thead>
               <tr className="bg-slate-50/90 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider select-none">
                 <th className="py-2.5 px-3 text-center w-12">#</th>
                 <th className="py-2.5 px-3">Pemain</th>
-                <th className="py-2.5 px-2 text-center w-10">G</th>
-                <th className="py-2.5 px-2 text-center w-10">W</th>
-                <th className="py-2.5 px-2 text-center w-10">L</th>
-                <th className="py-2.5 px-2 text-center w-10">T</th>
-                <th className="py-2.5 px-2.5 text-center w-14">DIFF</th>
-                <th className="py-2.5 px-3 text-left w-36">Riwayat Match</th>
-                <th className="py-2.5 px-2 text-center w-12">+M</th>
-                <th className="py-2.5 px-4 text-right w-16 text-sky-600">P</th>
+                <th className="py-2.5 px-2 text-center w-11">G</th>
+                <th className="py-2.5 px-2 text-center w-11">W</th>
+                <th className="py-2.5 px-2 text-center w-11">L</th>
+                <th className="py-2.5 px-2 text-center w-11">T</th>
+                <th className="py-2.5 px-3 text-center w-20">DIFF</th>
+                <th className="py-2.5 px-2.5 text-center w-14">+M</th>
+                <th className="py-2.5 px-4 text-right w-16 text-blue-600">P</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-xs">
@@ -276,7 +323,7 @@ export const PdlUpLeaderboard: React.FC<PdlUpLeaderboardProps> = ({
                     }`}
                   >
                     {/* Rank Badge */}
-                    <td className="py-3 px-3 text-center">
+                    <td className="py-2.5 px-3 text-center align-middle">
                       <div
                         className={`w-7 h-7 mx-auto rounded-xl font-black text-xs flex items-center justify-center transition-transform ${
                           isRank1
@@ -293,7 +340,7 @@ export const PdlUpLeaderboard: React.FC<PdlUpLeaderboardProps> = ({
                     </td>
 
                     {/* Player Name */}
-                    <td className="py-3 px-3">
+                    <td className="py-2.5 px-3 align-middle">
                       <div className="flex items-center gap-2 font-semibold text-slate-900">
                         <div className="w-6 h-6 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center text-[10px] font-bold shrink-0">
                           {row.name.charAt(0).toUpperCase()}
@@ -308,29 +355,29 @@ export const PdlUpLeaderboard: React.FC<PdlUpLeaderboardProps> = ({
                     </td>
 
                     {/* G (Games / Matches Played) */}
-                    <td className="py-3 px-2 text-center font-mono font-medium text-slate-600">
+                    <td className="py-2.5 px-2 text-center align-middle font-mono font-medium text-slate-600 tabular-nums">
                       {row.gamesPlayed}
                     </td>
 
                     {/* W (Wins) */}
-                    <td className="py-3 px-2 text-center font-mono font-bold text-emerald-600">
+                    <td className="py-2.5 px-2 text-center align-middle font-mono font-bold text-emerald-600 tabular-nums">
                       {row.wins}
                     </td>
 
                     {/* L (Losses) */}
-                    <td className="py-3 px-2 text-center font-mono font-medium text-rose-500">
+                    <td className="py-2.5 px-2 text-center align-middle font-mono font-medium text-rose-500 tabular-nums">
                       {row.losses}
                     </td>
 
                     {/* T (Ties) */}
-                    <td className="py-3 px-2 text-center font-mono text-slate-400">
+                    <td className="py-2.5 px-2 text-center align-middle font-mono text-slate-400 tabular-nums">
                       {row.ties}
                     </td>
 
-                    {/* DIFF (Point Differential) */}
-                    <td className="py-3 px-2.5 text-center">
-                      <span
-                        className={`inline-block font-mono font-bold text-xs ${
+                    {/* DIFF with Dot Matrix History Underneath */}
+                    <td className="py-2.5 px-3 text-center align-middle">
+                      <div
+                        className={`font-mono font-bold text-xs tabular-nums leading-none ${
                           row.pointDiff > 0
                             ? 'text-emerald-600'
                             : row.pointDiff < 0
@@ -339,20 +386,16 @@ export const PdlUpLeaderboard: React.FC<PdlUpLeaderboardProps> = ({
                         }`}
                       >
                         {row.pointDiff > 0 ? `+${row.pointDiff}` : row.pointDiff}
-                      </span>
-                    </td>
+                      </div>
 
-                    {/* Match History Dots */}
-                    <td className="py-3 px-3">
-                      <div className="flex items-center gap-1 overflow-x-hidden max-w-[140px]">
-                        {row.matchHistoryDots.length === 0 ? (
-                          <span className="text-[10px] text-slate-300 italic">-</span>
-                        ) : (
-                          row.matchHistoryDots.map((result, dIdx) => (
+                      {/* Dot matrix riwayat: Titik bulat kecil w-1.5 h-1.5 rounded-full di bawah angka DIFF */}
+                      {row.matchHistoryDots.length > 0 && (
+                        <div className="flex items-center justify-center gap-1 mt-1 overflow-hidden">
+                          {row.matchHistoryDots.slice(-8).map((result, dIdx) => (
                             <span
                               key={dIdx}
                               title={`Round ${dIdx + 1}: ${result.toUpperCase()}`}
-                              className={`w-2.5 h-2.5 rounded-full shrink-0 shadow-2xs transition-transform hover:scale-125 ${
+                              className={`w-1.5 h-1.5 rounded-full shrink-0 shadow-2xs ${
                                 result === 'win'
                                   ? 'bg-emerald-500'
                                   : result === 'loss'
@@ -360,28 +403,28 @@ export const PdlUpLeaderboard: React.FC<PdlUpLeaderboardProps> = ({
                                   : 'bg-slate-300'
                               }`}
                             />
-                          ))
-                        )}
-                      </div>
+                          ))}
+                        </div>
+                      )}
                     </td>
 
-                    {/* +M (Compensation Points) */}
-                    <td className="py-3 px-2 text-center">
+                    {/* +M (Compensation Points in Dedicated Column) */}
+                    <td className="py-2.5 px-2.5 text-center align-middle">
                       {hasComp ? (
                         <span
-                          className="inline-block px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono font-bold text-[10px]"
+                          className="inline-block px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono font-bold text-[10px] tabular-nums"
                           title={`+${row.compensationPoints} Compensation Points dari sit-out`}
                         >
                           +{row.compensationPoints}
                         </span>
                       ) : (
-                        <span className="text-slate-300 font-mono">-</span>
+                        <span className="text-slate-300 font-mono text-xs">-</span>
                       )}
                     </td>
 
-                    {/* P (Total Points - Highlighted Blue) */}
-                    <td className="py-3 px-4 text-right">
-                      <span className="font-mono font-black text-sky-600 text-base sm:text-lg tabular-nums">
+                    {/* P (Total Points - Highlighted Blue Bold) */}
+                    <td className="py-2.5 px-4 text-right align-middle">
+                      <span className="font-mono font-bold text-blue-600 text-base sm:text-lg tabular-nums">
                         {row.totalPoints}
                       </span>
                     </td>
@@ -398,35 +441,32 @@ export const PdlUpLeaderboard: React.FC<PdlUpLeaderboardProps> = ({
             const isRank1 = row.rank === 1;
             const isRank2 = row.rank === 2;
             const isRank3 = row.rank === 3;
-            const isExpanded = expandedPlayerId === row.id;
             const hasComp = row.compensationPoints > 0;
 
             return (
               <div
                 key={row.id}
-                onClick={() => setExpandedPlayerId(isExpanded ? null : row.id)}
-                className={`p-3 rounded-2xl border transition-all cursor-pointer ${
+                className={`p-3.5 rounded-2xl border transition-all ${
                   isRank1
-                    ? 'bg-amber-50/50 border-amber-200/90 shadow-2xs'
+                    ? 'bg-amber-50/40 border-amber-200 text-amber-950 shadow-2xs'
                     : isRank2
-                    ? 'bg-slate-50 border-slate-200'
+                    ? 'bg-slate-50/70 border-slate-200 text-slate-900'
                     : isRank3
-                    ? 'bg-amber-50/20 border-amber-200/60'
-                    : 'bg-white border-slate-200 hover:border-slate-300 shadow-2xs'
+                    ? 'bg-amber-50/20 border-amber-200/60 text-slate-900'
+                    : 'bg-white border-slate-200/80 hover:bg-slate-50/50 text-slate-800'
                 }`}
               >
-                {/* Primary Row: Rank + Name + Dots + Points */}
-                <div className="flex items-center justify-between gap-2.5">
+                <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div
                       className={`w-7 h-7 rounded-xl font-black text-xs flex items-center justify-center shrink-0 ${
                         isRank1
-                          ? 'bg-gradient-to-br from-amber-400 to-amber-500 text-white shadow-2xs'
+                          ? 'bg-amber-500 text-white shadow-2xs'
                           : isRank2
-                          ? 'bg-slate-200 text-slate-800'
+                          ? 'bg-slate-200 text-slate-700 font-bold'
                           : isRank3
-                          ? 'bg-amber-100 text-amber-900'
-                          : 'bg-slate-100 text-slate-600'
+                          ? 'bg-amber-100 text-amber-800 font-bold'
+                          : 'bg-slate-100 text-slate-600 font-semibold'
                       }`}
                     >
                       {row.rank}
@@ -434,104 +474,71 @@ export const PdlUpLeaderboard: React.FC<PdlUpLeaderboardProps> = ({
 
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-bold text-slate-900 text-xs sm:text-sm truncate">
+                        <span className="font-bold text-slate-900 text-sm truncate">
                           {row.name}
                         </span>
                         {isRank1 && <Crown className="w-3.5 h-3.5 text-amber-500 shrink-0" />}
                       </div>
 
-                      {/* Micro Form Dots under Name on Mobile */}
-                      <div className="flex items-center gap-1 mt-1">
-                        {row.matchHistoryDots.map((res, i) => (
-                          <span
-                            key={i}
-                            className={`w-2 h-2 rounded-full shrink-0 ${
-                              res === 'win'
-                                ? 'bg-emerald-500'
-                                : res === 'loss'
-                                ? 'bg-rose-500'
-                                : 'bg-slate-300'
-                            }`}
-                          />
-                        ))}
+                      <div className="flex items-center gap-2 text-[11px] text-slate-500 font-medium mt-0.5">
+                        <span>{row.gamesPlayed} Games</span>
+                        <span>•</span>
+                        <span className="text-emerald-600 font-semibold">{row.wins}W</span>
+                        <span>-</span>
+                        <span className="text-rose-500 font-semibold">{row.losses}L</span>
+                        {row.ties > 0 && <span>- {row.ties}T</span>}
                       </div>
                     </div>
                   </div>
 
-                  {/* Right Score Block: Total Points (Blue) */}
+                  {/* Right Side: Score P & Diff/Comp */}
                   <div className="flex items-center gap-3 text-right shrink-0">
                     <div>
-                      <div className="text-lg font-black font-mono text-sky-600 tabular-nums">
+                      <div className="text-xs font-mono font-bold">
+                        <span
+                          className={
+                            row.pointDiff > 0
+                              ? 'text-emerald-600'
+                              : row.pointDiff < 0
+                              ? 'text-rose-600'
+                              : 'text-slate-400'
+                          }
+                        >
+                          {row.pointDiff > 0 ? `+${row.pointDiff}` : row.pointDiff} Diff
+                        </span>
+                      </div>
+                      {hasComp && (
+                        <div className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-1 py-0.2 rounded border border-emerald-200 mt-0.5">
+                          +{row.compensationPoints}M
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="w-12 text-right">
+                      <span className="font-mono font-bold text-blue-600 text-lg tabular-nums">
                         {row.totalPoints}
-                      </div>
-                      <div className="text-[10px] text-slate-400 uppercase font-semibold">
-                        {scoringUnit === 'games' ? 'Games' : 'Poin'}
-                      </div>
-                    </div>
-                    <div className="text-slate-400 p-0.5">
-                      {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Subtitle / Stat Bar */}
-                <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium">
-                  <div className="flex items-center gap-2">
-                    <span>{row.gamesPlayed} Games</span>
-                    <span>•</span>
-                    <span className="text-emerald-700 font-semibold">{row.wins}W</span>
-                    <span>-</span>
-                    <span className="text-rose-600">{row.losses}L</span>
-                    {row.ties > 0 && (
-                      <>
-                        <span>-</span>
-                        <span className="text-slate-500">{row.ties}T</span>
-                      </>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`font-mono font-bold ${
-                        row.pointDiff > 0
-                          ? 'text-emerald-600'
-                          : row.pointDiff < 0
-                          ? 'text-rose-600'
-                          : 'text-slate-400'
-                      }`}
-                    >
-                      DIFF: {row.pointDiff > 0 ? `+${row.pointDiff}` : row.pointDiff}
-                    </span>
-                    {hasComp && (
-                      <span className="px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 font-mono text-[10px] font-bold border border-emerald-200">
-                        +{row.compensationPoints}M
                       </span>
-                    )}
+                    </div>
                   </div>
                 </div>
 
-                {/* Expandable Breakdown Drawer */}
-                {isExpanded && (
-                  <div className="mt-2.5 p-2.5 bg-slate-50 rounded-xl border border-slate-200/80 text-xs space-y-2 animate-in fade-in duration-150">
-                    <div className="text-[11px] font-bold text-slate-700">Rincian Pertandingan:</div>
-                    <div className="grid grid-cols-4 gap-2 text-center text-[11px]">
-                      <div className="p-1.5 bg-white rounded-lg border border-slate-200">
-                        <div className="text-slate-400 text-[10px]">Games (G)</div>
-                        <div className="font-bold text-slate-800">{row.gamesPlayed}</div>
-                      </div>
-                      <div className="p-1.5 bg-white rounded-lg border border-slate-200">
-                        <div className="text-slate-400 text-[10px]">Menang (W)</div>
-                        <div className="font-bold text-emerald-600">{row.wins}</div>
-                      </div>
-                      <div className="p-1.5 bg-white rounded-lg border border-slate-200">
-                        <div className="text-slate-400 text-[10px]">Kalah (L)</div>
-                        <div className="font-bold text-rose-500">{row.losses}</div>
-                      </div>
-                      <div className="p-1.5 bg-white rounded-lg border border-slate-200">
-                        <div className="text-slate-400 text-[10px]">Selisih (DIFF)</div>
-                        <div className="font-bold text-slate-800">{row.pointDiff > 0 ? `+${row.pointDiff}` : row.pointDiff}</div>
-                      </div>
-                    </div>
+                {/* Match History Dots */}
+                {row.matchHistoryDots.length > 0 && (
+                  <div className="flex items-center gap-1 mt-2.5 pt-2 border-t border-slate-100">
+                    <span className="text-[10px] text-slate-400 font-medium mr-1">Riwayat:</span>
+                    {row.matchHistoryDots.map((res, i) => (
+                      <span
+                        key={i}
+                        title={`Match ${i + 1}: ${res.toUpperCase()}`}
+                        className={`w-1.5 h-1.5 rounded-full ${
+                          res === 'win'
+                            ? 'bg-emerald-500'
+                            : res === 'loss'
+                            ? 'bg-rose-500'
+                            : 'bg-slate-300'
+                        }`}
+                      />
+                    ))}
                   </div>
                 )}
               </div>
@@ -540,17 +547,15 @@ export const PdlUpLeaderboard: React.FC<PdlUpLeaderboardProps> = ({
         </div>
       )}
 
-      {/* 4. Footer Summary */}
-      <div className="p-3.5 sm:px-5 border-t border-slate-100 bg-slate-50 text-xs text-slate-500 flex items-center justify-between">
-        <div className="flex items-center gap-1.5 font-medium text-slate-600">
-          <Flame className="w-3.5 h-3.5 text-amber-500" />
-          <span>PDL UP Standings Engine</span>
-        </div>
-        <div className="text-[11px] text-slate-400 font-mono">
-          Poin Utama (P) Highlighted in Blue
-        </div>
+      {/* 4. Footer */}
+      <div className="p-3 sm:px-5 border-t border-slate-100 bg-slate-50 text-xs text-slate-500 flex items-center justify-between">
+        <span className="font-medium">
+          Total: <strong className="text-slate-700">{rows.length}</strong> Pemain Terdaftar
+        </span>
+        <span className="text-[11px] text-slate-400 font-mono">
+          Urutan: {sortBy === 'points' ? 'BY POINTS (P > DIFF > W)' : 'BY WINS (W > P > DIFF)'}
+        </span>
       </div>
-
     </div>
   );
 };

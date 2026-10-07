@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import type { LeaderboardEntry, TournamentConfig, Round } from '../types/tournament';
 import { translations, type Language } from '../utils/translations';
-import { PdlUpLeaderboard } from './PdlUpLeaderboard';
 import { mapLeaderboardToPlayerRows } from '../utils/scheduler';
 import {
   Trophy,
@@ -9,12 +8,9 @@ import {
   Share2,
   Check,
   Crown,
-  Coffee,
-  ArrowUpDown,
   Users,
   EyeOff,
-  Maximize2,
-  X
+  ArrowRight
 } from 'lucide-react';
 
 interface LeaderboardPanelProps {
@@ -25,6 +21,7 @@ interface LeaderboardPanelProps {
   isSpectatorMode?: boolean;
   isCompleted?: boolean;
   rounds?: Round[];
+  onViewFullLeaderboard?: () => void;
 }
 
 export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
@@ -34,12 +31,12 @@ export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
   currentRound,
   isSpectatorMode = false,
   isCompleted = false,
-  rounds = []
+  rounds = [],
+  onViewFullLeaderboard
 }) => {
   const t = translations[lang];
   const [searchQuery, setSearchQuery] = useState('');
   const [copied, setCopied] = useState(false);
-  const [showFullModal, setShowFullModal] = useState(false);
 
   const isHiddenForSpectators = Boolean(
     config.advancedSettings?.hidePublicLeaderboard && isSpectatorMode && !isCompleted
@@ -75,48 +72,49 @@ export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-full">
-      {/* Header */}
-      <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-white">
-        <div className="flex items-center gap-2.5">
+    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col h-full">
+      {/* 1. Header Toolbar */}
+      <div className="p-3.5 border-b border-slate-100 flex items-center justify-between bg-white">
+        <div className="flex items-center gap-2 min-w-0">
           <div className="w-8 h-8 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center shrink-0">
             <Trophy className="w-4 h-4" />
           </div>
-          <div>
-            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+          <div className="min-w-0">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5 truncate">
               <span>{t.liveStandingsTitle}</span>
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-mono font-bold border border-emerald-200/80">
+              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-mono font-bold border border-emerald-200/80 shrink-0">
                 R{currentRound}
               </span>
             </h3>
-            <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-              <ArrowUpDown className="w-3 h-3 text-emerald-600" />
-              <span>{isFixedPair ? t.teamStandings : t.individualStandings}</span>
+            <p className="text-[11px] text-slate-500 font-medium truncate">
+              {isFixedPair ? t.teamStandings : t.individualStandings}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => setShowFullModal(true)}
-            className="px-2 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 flex items-center gap-1.5 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
-            title="Buka Tabel Detail Klasemen"
-          >
-            <Maximize2 className="w-3.5 h-3.5 text-slate-600" />
-            <span className="text-[11px] hidden sm:inline">{lang === 'id' ? 'Detail' : 'Table'}</span>
-          </button>
+        <div className="flex items-center gap-1.5 shrink-0">
+          {onViewFullLeaderboard && (
+            <button
+              type="button"
+              onClick={onViewFullLeaderboard}
+              className="px-2 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 flex items-center gap-1 text-[11px] font-semibold transition-all cursor-pointer shadow-2xs"
+              title={lang === 'id' ? 'Buka Tabel Klasemen Lengkap' : 'View Full Leaderboard'}
+            >
+              <span>{lang === 'id' ? 'Tabel Penuh' : 'Full Table'}</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          )}
 
           <button
             type="button"
             onClick={handleShare}
-            className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 flex items-center gap-1.5 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+            className="p-1.5 sm:px-2 sm:py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 flex items-center gap-1 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
             title={t.copyStandingsBtn}
           >
             {copied ? (
               <>
                 <Check className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="text-emerald-700 text-[11px] font-bold">{t.copiedText}</span>
+                <span className="text-emerald-700 text-[11px] font-bold hidden sm:inline">{t.copiedText}</span>
               </>
             ) : (
               <>
@@ -128,34 +126,22 @@ export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
         </div>
       </div>
 
-      {/* Search Input */}
-      <div className="p-3 border-b border-slate-100 bg-slate-50/50">
+      {/* 2. Search Input */}
+      <div className="p-2.5 border-b border-slate-100 bg-slate-50/50">
         <div className="relative">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             placeholder={t.searchPlaceholder(isFixedPair)}
-            className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 shadow-2xs"
+            className="w-full pl-7 pr-3 py-1 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
           />
         </div>
       </div>
 
-      {/* Column Headers for Maximum Clarity */}
-      <div className="px-4 py-1.5 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none">
-        <div className="flex items-center gap-2.5">
-          <span className="w-6 text-center">#</span>
-          <span>{isFixedPair ? (lang === 'id' ? 'Pasangan Tim' : 'Team') : (lang === 'id' ? 'Pemain' : 'Player')}</span>
-        </div>
-        <div className="flex items-center gap-3 text-right">
-          <span className="w-10 text-right">{config.scoringSystem === 'tennis_games' ? (lang === 'id' ? 'Set' : 'Sets') : 'Poin'}</span>
-          <span className="w-12 text-right">+/- Diff</span>
-        </div>
-      </div>
-
-      {/* Standings List */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2 max-h-[580px]">
+      {/* 3. Minimalist PDL UP Inline Table (Option A - Desktop Sidebar) */}
+      <div className="flex-1 overflow-y-auto max-h-[580px]">
         {isHiddenForSpectators ? (
           <div className="py-12 px-4 text-center space-y-3">
             <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto shadow-2xs">
@@ -175,128 +161,144 @@ export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
             {t.noScoresYet}
           </div>
         ) : (
-          filtered.map((entry, idx) => {
-            const displayRank = entry.rank ?? (idx + 1);
-            const isTop1 = displayRank === 1;
-            const isTop2 = displayRank === 2;
-            const isTop3 = displayRank === 3;
-            const displayPoints = entry.effectivePoints ?? entry.pointsWon;
-            const hasComp = Boolean(entry.compensationPoints && entry.compensationPoints > 0);
-            const pRow = playerRows.find(r => r.id === entry.id);
+          <table className="w-full text-left border-collapse table-fixed">
+            <thead>
+              <tr className="bg-slate-50/90 border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none">
+                <th className="py-2 px-1 text-center w-7">#</th>
+                <th className="py-2 px-2 text-left">{isFixedPair ? (lang === 'id' ? 'Tim' : 'Team') : (lang === 'id' ? 'Pemain' : 'Player')}</th>
+                <th className="py-2 px-1 text-center w-11">W-L</th>
+                <th className="py-2 px-1 text-center w-14">DIFF</th>
+                <th className="py-2 px-1 text-center w-9">+M</th>
+                <th className="py-2 px-2 text-right w-11 text-blue-600">P</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 text-xs">
+              {filtered.map((entry, idx) => {
+                const displayRank = entry.rank ?? (idx + 1);
+                const isTop1 = displayRank === 1;
+                const isTop2 = displayRank === 2;
+                const isTop3 = displayRank === 3;
+                const displayPoints = entry.effectivePoints ?? entry.pointsWon;
+                const hasComp = Boolean(entry.compensationPoints && entry.compensationPoints > 0);
+                const pRow = playerRows.find(r => r.id === entry.id);
 
-            return (
-              <div
-                key={entry.id}
-                className={`p-2.5 rounded-xl border flex items-center justify-between transition-all ${
-                  isTop1
-                    ? 'bg-amber-50/70 border-amber-200 text-amber-950 shadow-2xs'
-                    : isTop2
-                    ? 'bg-slate-50/90 border-slate-200/90 text-slate-900'
-                    : isTop3
-                    ? 'bg-amber-50/30 border-amber-200/60 text-slate-900'
-                    : 'bg-slate-50/60 border-slate-200/60 hover:bg-slate-50 text-slate-800'
-                }`}
-              >
-                {/* Left: Rank + Name + Dots */}
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div
-                    className={`w-6 h-6 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 ${
+                return (
+                  <tr
+                    key={entry.id}
+                    className={`transition-colors ${
                       isTop1
-                        ? 'bg-amber-500 text-white shadow-2xs'
+                        ? 'bg-amber-50/40 hover:bg-amber-50/60'
                         : isTop2
-                        ? 'bg-slate-200 text-slate-700'
+                        ? 'bg-slate-50/50 hover:bg-slate-100/60'
                         : isTop3
-                        ? 'bg-amber-100 text-amber-800'
-                        : 'bg-slate-100 text-slate-600'
+                        ? 'bg-amber-50/20 hover:bg-amber-50/40'
+                        : 'hover:bg-slate-50/70'
                     }`}
                   >
-                    {displayRank}
-                  </div>
-
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-semibold text-slate-900 text-xs sm:text-sm truncate">
-                        {entry.name}
-                      </span>
-                      {isTop1 && <Crown className="w-3.5 h-3.5 text-amber-500 shrink-0" />}
-                    </div>
-
-                    <div className="flex items-center gap-2 text-[10px] text-slate-500 font-medium">
-                      <span>{entry.matchesPlayed}M ({entry.matchesWon}W-{entry.matchesLost}L)</span>
-                      {entry.sitOutCount > 0 && (
-                        <span className="flex items-center gap-0.5 text-slate-400">
-                          <Coffee className="w-2.5 h-2.5" />
-                          {entry.sitOutCount}x
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Micro Form Dots */}
-                    {pRow && pRow.matchHistoryDots.length > 0 && (
-                      <div className="flex items-center gap-1 mt-1">
-                        {pRow.matchHistoryDots.map((res, i) => (
-                          <span
-                            key={i}
-                            title={`Match ${i + 1}: ${res.toUpperCase()}`}
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              res === 'win'
-                                ? 'bg-emerald-500'
-                                : res === 'loss'
-                                ? 'bg-rose-500'
-                                : 'bg-slate-300'
-                            }`}
-                          />
-                        ))}
+                    {/* 1. Rank # */}
+                    <td className="px-1 py-1.5 text-center align-middle">
+                      <div
+                        className={`w-5 h-5 mx-auto rounded-md font-bold text-[10px] font-mono flex items-center justify-center shrink-0 ${
+                          isTop1
+                            ? 'bg-amber-500 text-white shadow-2xs ring-1 ring-amber-300'
+                            : isTop2
+                            ? 'bg-slate-200 text-slate-700'
+                            : isTop3
+                            ? 'bg-amber-100 text-amber-800'
+                            : 'text-slate-500 font-semibold'
+                        }`}
+                      >
+                        {displayRank}
                       </div>
-                    )}
-                  </div>
-                </div>
+                    </td>
 
-                {/* Right: Points & Differential */}
-                <div className="flex items-center gap-3 text-right shrink-0">
-                  <div>
-                    <div className="text-base sm:text-lg font-black font-mono text-sky-600 tabular-nums flex items-center justify-end gap-1">
-                      <span>{displayPoints}</span>
-                      {hasComp && (
-                        <span
-                          className="text-[9px] font-bold text-emerald-700 bg-emerald-100/80 px-1 py-0.2 rounded border border-emerald-300"
-                          title={`Raw: ${entry.pointsWon} + ${entry.compensationPoints} Compensation (+M)`}
-                        >
-                          +{entry.compensationPoints}M
+                    {/* 2. Pemain */}
+                    <td className="px-2 py-1.5 align-middle min-w-0">
+                      <div className="flex items-center gap-1 min-w-0">
+                        <span className="font-semibold text-slate-900 text-xs truncate" title={entry.name}>
+                          {entry.name}
                         </span>
-                      )}
-                    </div>
-                    <div className="text-[9px] text-slate-400 uppercase font-semibold">
-                      {config.scoringSystem === 'tennis_games' ? t.totalGamesCol : t.totalPointsCol}
-                    </div>
-                  </div>
+                        {isTop1 && <Crown className="w-3 h-3 text-amber-500 shrink-0" />}
+                        {entry.sitOutCount > 0 && (
+                          <span
+                            className="text-[9px] text-slate-400 shrink-0 font-medium"
+                            title={`Sit-out: ${entry.sitOutCount}x`}
+                          >
+                            ☕
+                          </span>
+                        )}
+                      </div>
+                    </td>
 
-                  <div className="w-12">
-                    <div
-                      className={`text-xs font-bold font-mono tabular-nums ${
-                        entry.pointDiff > 0
-                          ? 'text-emerald-600'
-                          : entry.pointDiff < 0
-                          ? 'text-rose-600'
-                          : 'text-slate-400'
-                      }`}
-                    >
-                      {entry.pointDiff > 0 ? `+${entry.pointDiff}` : entry.pointDiff}
-                    </div>
-                    <div className="text-[9px] text-slate-400 uppercase font-semibold">
-                      {t.diffCol}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })
+                    {/* 3. W-L */}
+                    <td className="px-1 py-1.5 text-center align-middle font-mono text-[11px] text-slate-600 font-medium tabular-nums">
+                      {entry.matchesWon}-{entry.matchesLost}
+                    </td>
+
+                    {/* 4. DIFF with Micro Dot Matrix Underneath */}
+                    <td className="px-1 py-1.5 text-center align-middle">
+                      <div
+                        className={`font-mono font-bold text-xs tabular-nums leading-none ${
+                          entry.pointDiff > 0
+                            ? 'text-emerald-600'
+                            : entry.pointDiff < 0
+                            ? 'text-rose-600'
+                            : 'text-slate-400'
+                        }`}
+                      >
+                        {entry.pointDiff > 0 ? `+${entry.pointDiff}` : entry.pointDiff}
+                      </div>
+                      {/* Dot matrix riwayat: Titik bulat kecil w-1.5 h-1.5 rounded-full */}
+                      {pRow && pRow.matchHistoryDots.length > 0 && (
+                        <div className="flex items-center justify-center gap-0.5 mt-1 overflow-hidden">
+                          {pRow.matchHistoryDots.slice(-5).map((res, i) => (
+                            <span
+                              key={i}
+                              title={`Match: ${res.toUpperCase()}`}
+                              className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                                res === 'win'
+                                  ? 'bg-emerald-500'
+                                  : res === 'loss'
+                                  ? 'bg-rose-500'
+                                  : 'bg-slate-300'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </td>
+
+                    {/* 5. +M (Dedicated Column for Compensation) */}
+                    <td className="px-1 py-1.5 text-center align-middle">
+                      {hasComp ? (
+                        <span
+                          className="font-mono font-bold text-[10px] text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded border border-emerald-200/80 inline-block tabular-nums"
+                          title={`+${entry.compensationPoints} Compensation Points dari sit-out`}
+                        >
+                          +{entry.compensationPoints}
+                        </span>
+                      ) : (
+                        <span className="font-mono text-[11px] text-slate-300">-</span>
+                      )}
+                    </td>
+
+                    {/* 6. P (Total Points, Bold Blue, tabular-nums) */}
+                    <td className="px-2 py-1.5 text-right align-middle">
+                      <span className="font-mono font-bold text-blue-600 text-base tabular-nums">
+                        {displayPoints}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         )}
       </div>
 
-      {/* Footer Summary */}
-      <div className="p-3.5 border-t border-slate-100 bg-slate-50 text-xs text-slate-500 flex items-center justify-between">
-        <span className="flex items-center gap-1.5 font-medium">
+      {/* 4. Footer Summary */}
+      <div className="p-2.5 border-t border-slate-100 bg-slate-50 text-[11px] text-slate-500 flex items-center justify-between">
+        <span className="flex items-center gap-1 font-medium">
           <Users className="w-3.5 h-3.5 text-emerald-600" />
           <span>{t.registeredParticipantsFooter(leaderboard.length, isFixedPair)}</span>
         </span>
@@ -304,30 +306,6 @@ export const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
           {config.advancedSettings?.sortByWinsBeforePoints ? 'W > PTS > DIFF' : t.rankingCriteria}
         </span>
       </div>
-
-      {/* Modal Detailed PDL UP Leaderboard Table */}
-      {showFullModal && (
-        <div className="fixed inset-0 z-50 bg-black/45 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-          <div className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto">
-            <button
-              type="button"
-              onClick={() => setShowFullModal(false)}
-              className="absolute top-4 right-4 z-10 p-2 bg-white/90 hover:bg-slate-100 rounded-xl text-slate-500 hover:text-slate-900 border border-slate-200 transition-all cursor-pointer shadow-xs"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <PdlUpLeaderboard
-              rows={playerRows}
-              tournamentTitle={config.name}
-              currentRound={currentRound}
-              scoringUnit={config.scoringSystem === 'tennis_games' ? 'games' : 'points'}
-              isSpectatorMode={isSpectatorMode}
-              isCompleted={isCompleted}
-              hidePublicLeaderboard={config.advancedSettings?.hidePublicLeaderboard}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 };
